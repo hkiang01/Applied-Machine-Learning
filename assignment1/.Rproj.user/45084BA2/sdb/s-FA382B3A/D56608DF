@@ -1,0 +1,17 @@
+{
+    "contents" : "setwd('/Users/harry/projects/aml/assignment1/')\nrm(list=ls()) # housekeeping\nwdat<-read.csv('data.txt', header=FALSE)\nlibrary(klaR)\nlibrary(caret)\nbigx<-wdat[,-c(9)] #drop col 9\nbigy<-as.factor(wdat[,9]) #coerce col 9 and store as factor (class label)\nwtd<-createDataPartition(y=bigy, p=.8, list=FALSE) #randomly partitions with probability .8\n#svmlight \nsvm<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment1/')\n#run on testing data (remaining 20%)\nlabels<-predict(svm, bigx[-wtd,]) #run svm model object on test data\nfoo<-labels$class\n# evaluate performance on test data\nsum(foo==bigy[-wtd])/(sum(foo==bigy[-wtd])+sum(!(foo==bigy[-wtd])))\n",
+    "created" : 1454383007197.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "996625693",
+    "id" : "D56608DF",
+    "lastKnownWriteTime" : 1454550555,
+    "path" : "C:/Users/harry/projects/aml/assignment1/d.R",
+    "project_path" : "d.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

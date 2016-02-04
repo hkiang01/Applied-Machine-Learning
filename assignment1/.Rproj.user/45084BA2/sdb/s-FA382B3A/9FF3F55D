@@ -1,0 +1,17 @@
+{
+    "contents" : "#setwd('~/Current/Courses/LearningCourse/Pima')\nwdat<-read.csv('data.txt', header=FALSE)\nlibrary(klaR)\nlibrary(caret)\nbigx<-wdat[,-c(9)]\nbigy<-wdat[,9]\ntrscore<-array(dim=10)\ntescore<-array(dim=10)\nfor (wi in 1:10)\n{\n #wi<-1 # 1 split (no cross-validation)\n wtd<-createDataPartition(y=bigy, p=.8, list=FALSE) #random .8\n nbx<-bigx\n ntrbx<-nbx[wtd, ] #.8*700 x 8 matrix of features\n ntrby<-bigy[wtd] # features of respective wtd entries\n trposflag<-ntrby>0 # .8*700 x 1 matrix of T/F (T==1, F==0)\n ptregs<-ntrbx[trposflag, ] # subset of feature matrix with label 1 (same as pegs in example)\n ntregs<-ntrbx[!trposflag,] # subset of feature matrix with label 0 (same as negs in example)\n ntebx<-nbx[-wtd, ] # testing features\n nteby<-bigy[-wtd] # testing labels\n ptrmean<-sapply(ptregs, mean, na.rm=FALSE) # positive training mean excluding N/A's\n ntrmean<-sapply(ntregs, mean, na.rm=FALSE) # negative training mean excluding N/A's\n ptrsd<-sapply(ptregs, sd, na.rm=FALSE) #positive training standard dev excluding N/A's\n ntrsd<-sapply(ntregs, sd, na.rm=FALSE) #negative training standard dev excluding N/A's\n ptroffsets<-t(t(ntrbx)-ptrmean) # subtract mean from positive training\n ptrscales<-t(t(ptroffsets)/ptrsd) # divide positive training by std dev\n # square positive training and subtract the log of std dev\n ptrlogs<--(1/2)*rowSums(apply(ptrscales,c(1, 2), function(x)x^2), na.rm=TRUE)-sum(log(ptrsd))\n ntroffsets<-t(t(ntrbx)-ntrmean)\n ntrscales<-t(t(ntroffsets)/ntrsd)\n ntrlogs<--(1/2)*rowSums(apply(ntrscales,c(1, 2), function(x)x^2), na.rm=TRUE)-sum(log(ntrsd))\n lvwtr<-ptrlogs>ntrlogs #note that addition of log of prior is unecessary as they are both about equal\n gotrighttr<-lvwtr==ntrby #true if classification got right answer, false else\n trscore[wi]<-sum(gotrighttr)/(sum(gotrighttr)+sum(!gotrighttr)) # performance of classifier on splits\n # perform classification on test data\n pteoffsets<-t(t(ntebx)-ptrmean)\n ptescales<-t(t(pteoffsets)/ptrsd)\n ptelogs<--(1/2)*rowSums(apply(ptescales,c(1, 2), function(x)x^2), na.rm=TRUE)-sum(log(ptrsd))\n nteoffsets<-t(t(ntebx)-ntrmean)\n ntescales<-t(t(nteoffsets)/ntrsd)\n ntelogs<--(1/2)*rowSums(apply(ntescales,c(1, 2), function(x)x^2), na.rm=TRUE)-sum(log(ntrsd))\n lvwte<-ptelogs>ntelogs\n gotright<-lvwte==nteby\n tescore[wi]<-sum(gotright)/(sum(gotright)+sum(!gotright))\n}\n",
+    "created" : 1454378010432.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3156485689",
+    "id" : "9FF3F55D",
+    "lastKnownWriteTime" : 1454539133,
+    "path" : "C:/Users/harry/projects/aml/assignment1/a.R",
+    "project_path" : "a.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

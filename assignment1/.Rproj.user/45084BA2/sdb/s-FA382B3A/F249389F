@@ -1,0 +1,17 @@
+{
+    "contents" : "setwd('~/Current/Courses/LearningCourse/Pima')\nwdat<-read.csv('data.txt', header=FALSE)\nlibrary(klaR)\nlibrary(caret)\n\n\nbigx<-wdat[,-c(9)] #drop col 9 that contains labels\nbigy<-as.factor(wdat[,9]) #coerce col 9 into storing it as a factor (takes in fixed number of vars)\nwtd<-createDataPartition(y=bigy, p=.8, list=FALSE) #randomly split 80% of data\ntrax<-bigx[wtd,] #training features\ntray<-bigy[wtd] #choose rows with indices wtd\nmodel<-train(trax, tray, 'nb', trControl=trainControl(method='cv', number=10)) #trust validation built in, in this case 10 times\nteclasses<-predict(model,newdata=bigx[-wtd,]) #gives predictions on test data\nconfusionMatrix(data=teclasses, bigy[-wtd])\n",
+    "created" : 1454387161864.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3365490393",
+    "id" : "F249389F",
+    "lastKnownWriteTime" : 1454539541,
+    "path" : "C:/Users/harry/projects/aml/assignment1/c.R",
+    "project_path" : "c.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
