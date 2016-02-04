@@ -1,4 +1,3 @@
-setwd('~/Current/Courses/LearningCourse/Pima')
 wdat<-read.csv('data.txt', header=FALSE)
 library(klaR)
 library(caret)
@@ -43,4 +42,5 @@ for (wi in 1:10)
  gotright<-lvwte==nteby
  tescore[wi]<-sum(gotright)/(sum(gotright)+sum(!gotright))
 }
-
+trscoremean<-mean(trscore)
+tescoremean<-mean(tescore)
