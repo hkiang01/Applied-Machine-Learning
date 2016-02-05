@@ -29,4 +29,8 @@ testdat<-otherdat[test_indices,] # test features
 testlab<-otherlab[test_indices] # test labels
 valdat<-otherdat[-test_indices,] #validation features
 vallab<-otherlab[-test_indices] #validation labels
- 
+
+#exp(1) represents e
+lamda_arr<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1)
+alpha<-matrix(data=0, ncol=NCOL(bigx))
+beta<-0
