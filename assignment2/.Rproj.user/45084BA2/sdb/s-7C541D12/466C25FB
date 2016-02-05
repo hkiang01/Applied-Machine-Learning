@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454653283445.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "466C25FB",
+    "lastKnownWriteTime" : 21392300099829876,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "2l3ies7ktz",
+        "caption" : "bigx",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=bigx&cache_key=2l3ies7ktz",
+        "displayedObservations" : 48842,
+        "environment" : "",
+        "object" : "bigx",
+        "totalObservations" : 48842,
+        "variables" : 6
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}
