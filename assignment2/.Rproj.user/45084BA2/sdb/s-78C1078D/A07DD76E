@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454877043810.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A07DD76E",
+    "lastKnownWriteTime" : 7011605692497750387,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "3hjovkykct",
+        "caption" : "trdat",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=trdat&cache_key=3hjovkykct",
+        "displayedObservations" : 39073,
+        "environment" : "",
+        "object" : "trdat",
+        "totalObservations" : 39073,
+        "variables" : 6
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}
