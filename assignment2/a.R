@@ -1,3 +1,30 @@
+
+
+accuracyfunc <- function(valdat, vallab, alpha, beta) {
+  # compute accuracy on validation set
+  # valdat has validation features, vallab has validation labels
+  valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
+  for(m in 1:50) { #for each data point in validation
+    #uniformly pick at random one validation point
+    dp<-sample(1:NROW(vallab),1)
+    # yi = sign(t(alpha)*xi+beta)
+    xi<-valdat[dp,] # the validation row
+    prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
+    
+    # compare prediction with respective vllab entry
+    if(prediction == vallab[dp]) { # good prediction
+      valtest[dp]<-1
+    }
+    else { #bad prediction
+      valtest[dp]<-0
+    }
+  } # dp
+  gotright<-sum(valtest) # number of good predictions
+  acc<-gotright/(NROW(valtest))
+  return(acc)
+}
+
+
 wdat<-read.csv('adult.data', header=FALSE)
 library(klaR)
 library(caret)
@@ -50,7 +77,10 @@ for(l in 1:NROW(lambda)) { # for each lambda
   alpha<-matrix(data=0, ncol=NCOL(bigx))
   beta<-0 # matrix of labels
   
-  accuracies<-matrix(data=0,ncol=Ne) #on validation
+  accuracies<-matrix(data=0,ncol=Ne) #on validation for each epoch
+  yplotaccuracies<-matrix(data=0, ncol=((Ne*Ns)/30)) # for acc val 30 steps
+  xplotaccuracies<-matrix(data=0, ncol=((Ne*Ns)/30)) # for acc val 30 steps
+  pac<-1
   
   # choose random starting point
   #a0<-0 # choose random set of attributes
@@ -95,31 +125,29 @@ for(l in 1:NROW(lambda)) { # for each lambda
         beta<-beta-n*(-ynum)
     	}
   	
+    	# compute accuracy of current classifier on set held out
+    	# for the epoch every 30 steps
+    	if(j%%30==0) {
+    	  curacc<-accuracyfunc(valdat, vallab, alpha, beta)
+    	  yplotaccuracies[pac]<-curacc
+    	  xplotaccuracies[pac]<-j
+    	  pac<-pac+1
+    	}
+    	
     } #step
     
     # compute accuracy on validation set
     # valdat has validation features, vallab has validation labels
-    valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
-    for(m in 1:50) { #for each data point in validation
-      #uniformly pick at random one validation point
-      dp<-sample(1:NROW(vallab),1)
-      # yi = sign(t(alpha)*xi+beta)
-      xi<-valdat[dp,] # the validation row
-      prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
-      
-      # compare prediction with respective vllab entry
-      if(prediction == vallab[dp]) { # good prediction
-        valtest[dp]<-1
-      }
-      else { #bad prediction
-        valtest[dp]<-0
-      }
-    } # dp
-    gotright<-sum(valtest) # number of good predictions
-    accuracies[l]<-gotright/(NROW(valtest))
+    # alpha has the features weights, beta has the bias
+    curacc<-accuracyfunc(valdat, vallab, alpha, beta)
+    accuracies[l]<-curacc
     
   } # epoch
   
+  # generate plot for plotaccuracies (30 steps per point)
+  # x: number of steps
+  # y: accuracy (0 to 1)
+  lambdaplot<-plot(xplotaccuracies,yplotaccuracies)
 } # lambda
 
 
