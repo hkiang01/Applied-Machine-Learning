@@ -1,30 +1,3 @@
-
-
-accuracyfunc <- function(valdat, vallab, alpha, beta) {
-  # compute accuracy on validation set
-  # valdat has validation features, vallab has validation labels
-  valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
-  for(m in 1:50) { #for each data point in validation
-    #uniformly pick at random one validation point
-    dp<-sample(1:NROW(vallab),1)
-    # yi = sign(t(alpha)*xi+beta)
-    xi<-valdat[dp,] # the validation row
-    prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
-    
-    # compare prediction with respective vllab entry
-    if(prediction == vallab[dp]) { # good prediction
-      valtest[dp]<-1
-    }
-    else { #bad prediction
-      valtest[dp]<-0
-    }
-  } # dp
-  gotright<-sum(valtest) # number of good predictions
-  acc<-gotright/(NROW(valtest))
-  return(acc)
-}
-
-
 wdat<-read.csv('adult.data', header=FALSE)
 library(klaR)
 library(caret)
@@ -64,12 +37,33 @@ vallab<-otherlab[-test_indices] #validation labels
 
 #------------------------------------------------------------------
 
+# variables in global scope for debugging
+
 Ne<-50 # number epochs
 Ns<-300 # number steps
 a<-0.01
 b<-50
 #exp(1) represents e
 lambda<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1) # regularization weight
+lc<-0 #lambdacounter
+
+lambdacur<-0
+alphas<-matrix(data=0, ncol=NROW(lambda))
+betas<-matrix(data=0, ncol=NROW(lambda))
+accuracies_matrix<-matrix(data=0, nrow=NROW(lambda), ncol=((Ne*Ns)/30)) #row per lambda, cols accuracies over time
+yplotaccuracies_matrix<-matrix(data=0, nrow=NROW(lambda), ncol=((Ne*Ns)/30)) #row per lambda, cols accuracies over time
+xplotaccuracies_matrix<-matrix(data=0, nrow=NROW(lambda), ncol=((Ne*Ns)/30)) #row per lambda, cols accuracies over time
+num<-0
+ynum<-trlab[num]
+xnum<-trdat[num,]
+alpha<-matrix(data=0, ncol=NCOL(bigx))
+beta<-0 # matrix of labels
+gamma<-sum(alpha*xnum) + beta
+temp<-0
+temp2<-0
+first<-0
+second<-0
+curacc<-0
 
 # the meat.
 for(l in 1:NROW(lambda)) { # for each lambda
@@ -147,7 +141,42 @@ for(l in 1:NROW(lambda)) { # for each lambda
   # generate plot for plotaccuracies (30 steps per point)
   # x: number of steps
   # y: accuracy (0 to 1)
-  lambdaplot<-plot(xplotaccuracies,yplotaccuracies)
+  plot(xplotaccuracies,yplotaccuracies)
+  
+  
+  # store into global env
+  alphas[lc]<-alpha
+  betas[lc]<-beta
+  accuracies_matrix[lc,]<-accuracies
+  yplotaccuracies_matrix[lc,]<-yplotaccuracies
+  xplotaccuracies_matrix[lc,]<-xplotaccuracies
+  
+  lc<-lc+1
 } # lambda
 
+
+
+accuracyfunc <- function(valdat, vallab, alpha, beta) {
+  # compute accuracy on validation set
+  # valdat has validation features, vallab has validation labels
+  valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
+  for(m in 1:50) { #for each data point in validation
+    #uniformly pick at random one validation point
+    dp<-sample(1:NROW(vallab),1)
+    # yi = sign(t(alpha)*xi+beta)
+    xi<-valdat[dp,] # the validation row
+    prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
+    
+    # compare prediction with respective vllab entry
+    if(prediction == vallab[dp]) { # good prediction
+      valtest[dp]<-1
+    }
+    else { #bad prediction
+      valtest[dp]<-0
+    }
+  } # dp
+  gotright<-sum(valtest) # number of good predictions
+  acc<-gotright/(NROW(valtest))
+  return(acc)
+}
 
