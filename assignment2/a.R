@@ -48,12 +48,12 @@ lambda<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1) # regularization weight
 lc<-0 #lambdacounter
 
 lambdacur<-0
-alphas<-matrix(data=0, ncol=NROW(lambda))
+alphas<-matrix(data=0, nrow=NROW(lambda), ncol=NCOL(bigx))
 betas<-matrix(data=0, ncol=NROW(lambda))
 accuracies_matrix<-matrix(data=0, nrow=NROW(lambda), ncol=((Ne*Ns)/30)) #row per lambda, cols accuracies over time
 yplotaccuracies_matrix<-matrix(data=0, nrow=NROW(lambda), ncol=((Ne*Ns)/30)) #row per lambda, cols accuracies over time
 xplotaccuracies_matrix<-matrix(data=0, nrow=NROW(lambda), ncol=((Ne*Ns)/30)) #row per lambda, cols accuracies over time
-num<-0
+num<-1
 ynum<-trlab[num]
 xnum<-trdat[num,]
 alpha<-matrix(data=0, ncol=NCOL(bigx))
