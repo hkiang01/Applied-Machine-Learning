@@ -28,10 +28,10 @@ trlab<-bigy2[tr_indices] #training labels
 otherdat<-bigx[-tr_indices,]
 otherlab<-bigy2[-tr_indices]
 test_indices<-createDataPartition(y=otherlab, p=.5, list=FALSE)
-#10% validation
+#10% test
 testdat<-otherdat[test_indices,] # test features 
 testlab<-otherlab[test_indices] # test labels
-#10% test
+#10% validation
 valdat<-otherdat[-test_indices,] #validation features
 vallab<-otherlab[-test_indices] #validation labels
 
@@ -39,55 +39,85 @@ vallab<-otherlab[-test_indices] #validation labels
 
 Ne<-50 # number epochs
 Ns<-300 # number steps
-#exp(1) represents e
-lambda<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1) # regularization weight
-lambdacur<-lambda[1]
-alpha<-matrix(data=0, ncol=NCOL(bigx))
-beta<-0 # matrix of labels
-
-# choose random starting point
-#a0<-0 # choose random set of attributes
-#b0<-0 # choose label corresponding to that random set?
-#u0<-[a0,b0] 
-
 a<-0.01
 b<-50
-for (i in 1:Ne){ # for each epoch 
-	n<-1/(a*i + b) #c compute step length
-	# choose subset of training set for validation
-  
-	# select a single data item uniformly and at random
-	# choose number between 1 and NROW(trlab) or NROW(trdat)
-	
-	num<-sample(1:NROW(trlab),1)
-	ynum<-trlab[num] #yi from notes
-	xnum<-trdat[num,] #xi from notes
-	gamma<-sum(alpha*xnum) #yk(a*x+b) in notes
+#exp(1) represents e
+lambda<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1) # regularization weight
 
-	# update rule
-	if(ynum*gamma >= 1) {
-	  # first case
-	  # alpha(n+1) = alpha - n(lamda*alpha)
-	  temp<-lambdacur*alpha
-	  temp2<-n*temp
-	  alpha<-alpha-temp2
-	  
-	  # preserve beta
-	  beta<-beta
-	}
-	else {
-    # otherwise case
-    # alpha(n+1) = alpha - n(lamda*alpha - yk*x)
-    first<-lambdacur*alpha
-    second<-ynum*xnum
-    temp<-first-second
-    temp2<-n*temp
-    alpha<-alpha-temp2
+# the meat.
+for(l in 1:NROW(lambda)) { # for each lambda
+  lambdacur<-lambda[l]
+  alpha<-matrix(data=0, ncol=NCOL(bigx))
+  beta<-0 # matrix of labels
+  
+  accuracies<-matrix(data=0,ncol=Ne) #on validation
+  
+  # choose random starting point
+  #a0<-0 # choose random set of attributes
+  #b0<-0 # choose label corresponding to that random set?
+  #u0<-[a0,b0] 
+  
+
+  for (i in 1:Ne){ # for each epoch
+    for (j in 1:Ns){ # for each step
+    	n<-1/(a*i + b) #c compute step length
+    	# choose subset of training set for validation
+      
+    	# select a single data item uniformly and at random
+    	# choose number between 1 and NROW(trlab) or NROW(trdat)
+    	
+    	num<-sample(1:NROW(trlab),1)
+    	ynum<-trlab[num] #yi from notes
+    	xnum<-trdat[num,] #xi from notes
+    	gamma<-sum(alpha*xnum) + beta #yk(a*x+b) in notes
     
-    # beta(n+1) = beta -n(-yk)
-    beta<-beta-n*(-ynum)
-	}
-	
-}
+    	# update rule
+    	if(ynum*gamma >= 1) {
+    	  # first case
+    	  # alpha(n+1) = alpha - n(lamda*alpha)
+    	  temp<-lambdacur*alpha
+    	  temp2<-n*temp
+    	  alpha<-alpha-temp2
+    	  
+    	  # preserve beta
+    	  beta<-beta
+    	}
+    	else {
+        # otherwise case
+        # alpha(n+1) = alpha - n(lamda*alpha - yk*x)
+        first<-lambdacur*alpha
+        second<-ynum*xnum
+        temp<-first-second
+        temp2<-n*temp
+        alpha<-alpha-temp2
+        
+        # beta(n+1) = beta -n(-yk)
+        beta<-beta-n*(-ynum)
+    	}
+  	
+    } #step
+    
+    # compute accuracy on validation set
+    # valdat has validation features, vallab has validation labels
+    valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
+    for(dp in 1:NROW(vallab)) { #for each data point in validation
+      # yi = sign(t(alpha)*xi+beta)
+      xi<-valdat[dp,] # the validation row
+      prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
+      
+      # compare prediction with respective vllab entry
+      if(prediction == vallab[dp]) { # good prediction
+        valtest[dp]<-1
+      }
+      else { #bad prediction
+        valtest[dp]<-0
+      }
+    } # dp
+    gotright<-sum(valtest) # number of good predictions
+    accuracies[l]<-gotright/(NROW(valtest))
+    
+  } # epoch
+  
+} # lambda
 
 
