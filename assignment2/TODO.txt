@@ -1,0 +1,27 @@
+TODO Stochastic Gradient Descent (Taken from Procedure: 2.1)
+
+[X] each xi is a d-dim feature vector
+[X] each yi is a label either 1/-1
+[X] choose set of possible values of lambda
+[X] 	train model by choosing Ne = at least 50 epochs...
+[X] 	...and number of steps Ns = at least 300 steps per epoch
+[X] 	choose random start point u0 = [a,b]
+[X] 	for each epoch compute steplength n = 1/(ae + b)
+[] 	for e'th epoch, choose subset of training set for 
+   	validation of that epoch and repeat until model updated Ns times
+	[] take k steps, each step selects single data uniform at random
+	[] p = -gradient(gi(u))-lambda*u
+	[] un+1 = un + np
+	[] evaluate current model by computing accuracy
+
+TODO Training SVM
+We want to pick a,b to minimizeC(a,b) = (1/N)sum( max(0,1-yi(a.xi+b)) ) + lambda/2 *aTa
+
+[]	pick kth example and compute gradient( max(0,1-yk(a.xk+b))+lambda/2 * aTa )
+	[]	pk = [lambda*a 0] 				if yk(a.xk+b) >=1
+	[]	pk = [lambda*a-ykx -yk] 		otherwise
+[] choose steplength n and update estimates
+	[] a(n+1) = a(n) - n(lambda*a) 		if yk(a.xk+b) >=1
+	[] a(n+1) = a(n) - n(lambda*a-ykx) 	otherwise
+	[] b(n+1) = b(n) - n(0) 			if yk(a.xk+b) >=1
+	[] b(n+1) = b(n) - n(-yk) 			otherwise

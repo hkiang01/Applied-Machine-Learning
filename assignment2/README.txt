@@ -1,6 +1,5 @@
 To run code:
 
-Should we be combining test files?
 
                                                                                         
                                                                                         
