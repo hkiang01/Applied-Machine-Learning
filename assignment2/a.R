@@ -100,7 +100,9 @@ for(l in 1:NROW(lambda)) { # for each lambda
     # compute accuracy on validation set
     # valdat has validation features, vallab has validation labels
     valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
-    for(dp in 1:NROW(vallab)) { #for each data point in validation
+    for(m in 1:50) { #for each data point in validation
+      #uniformly pick at random one validation point
+      dp<-sample(1:NROW(vallab),1)
       # yi = sign(t(alpha)*xi+beta)
       xi<-valdat[dp,] # the validation row
       prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
