@@ -10,14 +10,14 @@
     "path" : null,
     "project_path" : null,
     "properties" : {
-        "cacheKey" : "84a85eeuns",
+        "cacheKey" : "e12f3m9mtd",
         "caption" : "accuracies",
-        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=accuracies&cache_key=84a85eeuns",
-        "displayedObservations" : 1,
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=accuracies&cache_key=e12f3m9mtd",
+        "displayedObservations" : "1",
         "environment" : "",
         "object" : "accuracies",
-        "totalObservations" : 1,
-        "variables" : 50
+        "totalObservations" : "1",
+        "variables" : "50"
     },
     "relative_order" : 3,
     "source_on_save" : false,

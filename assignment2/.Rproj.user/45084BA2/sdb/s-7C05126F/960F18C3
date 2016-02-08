@@ -10,14 +10,14 @@
     "path" : null,
     "project_path" : null,
     "properties" : {
-        "cacheKey" : "f7fszkwtkg",
+        "cacheKey" : "20h8mod5hb",
         "caption" : "lambdaaccuracies",
-        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=lambdaaccuracies&cache_key=f7fszkwtkg",
-        "displayedObservations" : 1,
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=lambdaaccuracies&cache_key=20h8mod5hb",
+        "displayedObservations" : "1",
         "environment" : "",
         "object" : "lambdaaccuracies",
-        "totalObservations" : 1,
-        "variables" : 4
+        "totalObservations" : "1",
+        "variables" : "4"
     },
     "relative_order" : 2,
     "source_on_save" : false,

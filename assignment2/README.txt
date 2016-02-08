@@ -1,5 +1,9 @@
 To run code:
 
+Open RStudio.
+Open assignment2.Rproj
+Open a.R
+
 
                                                                                         
                                                                                         

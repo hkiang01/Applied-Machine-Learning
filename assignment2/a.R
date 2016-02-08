@@ -89,7 +89,8 @@ a<-0.01
 b<-50
 #exp(1) represents e
 #lambda<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1) # regularization weight
-lambda<-c(0.001, 0.01, 0.1, 1) # regularization weight
+#lambda<-c(0.001, 0.01, 0.1, 1) # regularization weight
+lambda<-c(0.005, 0.0075, 0.05, 0.075) # regularization weight
 lambdaaccuracies<-matrix(data=0, ncol=NROW(lambda))
 
 # the meat.
