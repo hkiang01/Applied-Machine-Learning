@@ -1,1 +1,1 @@
-{"active_set":"","sets":[]}
+{"active_set":"Diagnostics","sets":[{"base_path":"","markers":[{"column":6,"line":138,"log_line":-1,"log_path":"","message":"unexpected token &#x27;else&#x27;","path":"C:/Users/harry/projects/aml/assignment2/a.R","show_error_list":true,"type":0}],"name":"Diagnostics"}]}

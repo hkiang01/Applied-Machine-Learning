@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454905514191.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "89C432E5",
+    "lastKnownWriteTime" : 2332068776267823451,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "b9t5vgz6el",
+        "caption" : "tr_indices",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=tr_indices&cache_key=b9t5vgz6el",
+        "displayedObservations" : 39073,
+        "environment" : "",
+        "object" : "tr_indices",
+        "totalObservations" : 39073,
+        "variables" : 1
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

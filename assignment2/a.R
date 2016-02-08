@@ -1,3 +1,29 @@
+
+accuracyfunc <- function(dat, lab, alpha, beta) {
+  # compute accuracy on dat set
+  # dat has features, lab has labels
+  valtest<-matrix(data=0, nrow=50) # predictions for this epoch
+  for(m in 1:50) { #for each data point in data
+    #uniformly pick at random one validation point
+    dp<-sample(1:NROW(lab),1)
+    # yi = sign(t(alpha)*xi+beta)
+    xi<-dat[dp,] # the validation row
+    prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
+    
+    # compare prediction with respective vllab entry
+    if(prediction == lab[dp]) { # good prediction
+      valtest[m]<-1
+    }
+    else { #bad prediction
+      valtest[m]<-0
+    }
+  } # dp
+  gotright<-sum(valtest) # number of good predictions
+  acc<-gotright/(NROW(valtest))
+  return(acc)
+}
+
+
 wdat<-read.csv('adult.data', header=FALSE)
 library(klaR)
 library(caret)
@@ -8,7 +34,7 @@ bigy2<-matrix() #blank matrix
 #------------------------------------------------------------------
 
 # for loop to replace <=50K with -1 and >50K with 1
-counter<-0
+counter<-1
 for(i in bigy) {
   #if(identical(j, i)) {
   if(identical(" <=50K", i)) {
@@ -40,11 +66,13 @@ vallab<-otherlab[-test_indices] #validation labels
 # variables in global scope for debugging
 
 Ne<-50 # number epochs
-Ns<-300 # number steps
+#Ns<-300 # number steps
+Ns<-1
 a<-0.01
 b<-50
 #exp(1) represents e
 lambda<-c(exp(1)-3, exp(1)-2, exp(1)-1, 1) # regularization weight
+lambdaaccuracies<-matrix(data=0, ncol=NROW(lambda))
 lc<-0 #lambdacounter
 
 lambdacur<-0
@@ -67,6 +95,7 @@ curacc<-0
 
 # the meat.
 for(l in 1:NROW(lambda)) { # for each lambda
+#  l<-1
   lambdacur<-lambda[l]
   alpha<-matrix(data=0, ncol=NCOL(bigx))
   beta<-0 # matrix of labels
@@ -83,6 +112,7 @@ for(l in 1:NROW(lambda)) { # for each lambda
   
 
   for (i in 1:Ne){ # for each epoch
+#    i<-1
     for (j in 1:Ns){ # for each step
     	n<-1/(a*i + b) #c compute step length
     	# choose subset of training set for validation
@@ -119,10 +149,10 @@ for(l in 1:NROW(lambda)) { # for each lambda
         beta<-beta-n*(-ynum)
     	}
   	
-    	# compute accuracy of current classifier on set held out
+    	# compute accuracy of current classifier on set held out on training data
     	# for the epoch every 30 steps
     	if(j%%30==0) {
-    	  curacc<-accuracyfunc(valdat, vallab, alpha, beta)
+    	  curacc<-accuracyfunc(trdat, trlab, alpha, beta)
     	  yplotaccuracies[pac]<-curacc
     	  xplotaccuracies[pac]<-j
     	  pac<-pac+1
@@ -130,10 +160,10 @@ for(l in 1:NROW(lambda)) { # for each lambda
     	
     } #step
     
-    # compute accuracy on validation set
-    # valdat has validation features, vallab has validation labels
+    # compute accuracy on training set (to get accuracy of model)
+    # trdat has training features, trlab has training labels
     # alpha has the features weights, beta has the bias
-    curacc<-accuracyfunc(valdat, vallab, alpha, beta)
+    curacc<-accuracyfunc(trdat, trlab, alpha, beta)
     accuracies[l]<-curacc
     
   } # epoch
@@ -142,10 +172,15 @@ for(l in 1:NROW(lambda)) { # for each lambda
   # x: number of steps
   # y: accuracy (0 to 1)
   plot(xplotaccuracies,yplotaccuracies)
+  title(main = paste("lambda = ", lambda[l]))
+
   
-  
+  # code to test lambdas on validation
+  curlambdaacc<-accuracyfunc(valdat, vallab, alpha, beta)
+  lambdaaccuracies[l]<-curlambdaacc
+    
   # store into global env
-  alphas[lc]<-alpha
+  alphas[lc,]<-alpha
   betas[lc]<-beta
   accuracies_matrix[lc,]<-accuracies
   yplotaccuracies_matrix[lc,]<-yplotaccuracies
@@ -153,30 +188,5 @@ for(l in 1:NROW(lambda)) { # for each lambda
   
   lc<-lc+1
 } # lambda
-
-
-
-accuracyfunc <- function(valdat, vallab, alpha, beta) {
-  # compute accuracy on validation set
-  # valdat has validation features, vallab has validation labels
-  valtest<-matrix(data=0, ncol=NROW(vallab)) # predictions for this epoch
-  for(m in 1:50) { #for each data point in validation
-    #uniformly pick at random one validation point
-    dp<-sample(1:NROW(vallab),1)
-    # yi = sign(t(alpha)*xi+beta)
-    xi<-valdat[dp,] # the validation row
-    prediction<-sign(sum(alpha*xi)) # 1 or -1 from generated model
-    
-    # compare prediction with respective vllab entry
-    if(prediction == vallab[dp]) { # good prediction
-      valtest[dp]<-1
-    }
-    else { #bad prediction
-      valtest[dp]<-0
-    }
-  } # dp
-  gotright<-sum(valtest) # number of good predictions
-  acc<-gotright/(NROW(valtest))
-  return(acc)
-}
+# report best lambda
 
