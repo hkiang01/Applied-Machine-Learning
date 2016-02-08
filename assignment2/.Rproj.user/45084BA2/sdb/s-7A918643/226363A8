@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454913433552.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "226363A8",
+    "lastKnownWriteTime" : 7011605692497750387,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "mn66bklaiw",
+        "caption" : "xplot",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=xplot&cache_key=mn66bklaiw",
+        "displayedObservations" : "1",
+        "environment" : "",
+        "object" : "xplot",
+        "totalObservations" : "1",
+        "variables" : "15000"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

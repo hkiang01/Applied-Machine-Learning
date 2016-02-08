@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454913483926.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D213A09A",
+    "lastKnownWriteTime" : 8026301178108343357,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "6xt7ham1gc",
+        "caption" : "xplotaccuracies",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=xplotaccuracies&cache_key=6xt7ham1gc",
+        "displayedObservations" : "1",
+        "environment" : "",
+        "object" : "xplotaccuracies",
+        "totalObservations" : "1",
+        "variables" : "15000"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

@@ -93,13 +93,14 @@ lambdaaccuracies<-matrix(data=0, ncol=NROW(lambda))
 
 # the meat.
 for(l in 1:NROW(lambda)) { # for each lambda
+  #l<-1
   lambdacur<-lambda[l]
   alpha<-matrix(data=0, ncol=NCOL(bigx))
   beta<-0 # matrix of labels
   
   accuracies<-matrix(data=0,ncol=Ne) #on validation for each epoch
-  yplotaccuracies<-matrix(data=0, ncol=((Ne*Ns)/30)) # for acc val 30 steps
-  xplotaccuracies<-matrix(data=0, ncol=((Ne*Ns)/30)) # for acc val 30 steps
+  yplotaccuracies<-matrix(data=0, ncol=((Ne*Ns))) # for acc val 30 steps
+  xplotaccuracies<-matrix(data=0, ncol=((Ne*Ns))) # for acc val 30 steps
   xplot<-matrix(data=0, ncol=(Ne*Ns)) # for acc val every step in a given epoch
   yplot<-matrix(data=0, ncol=(Ne*Ns)) # for acc val every step in a given epoch
   pac<-1
@@ -142,14 +143,13 @@ for(l in 1:NROW(lambda)) { # for each lambda
     	# for the epoch every 30 steps
     	if(j%%30==0) {
     	  curacc<-accuracyfunc(trdat, trlab, alpha, beta)
-    	  yplotaccuracies[pac]<-curacc
-    	  xplotaccuracies[pac]<-j
-    	  pac<-pac+1
+    	  yplotaccuracies[i*Ns+j]<-curacc
+    	  xplotaccuracies[i*Ns+j]<-i*Ns+j
     	}
     	
     	curacc<-accuracyfunc(trdat, trlab, alpha, beta)
-    	yplot[j]<-curacc
-    	xplot[j]<-j
+    	yplot[i*Ns+j]<-curacc
+    	xplot[i*Ns+j]<-i*Ns+j
     	
     } #step
     
@@ -159,14 +159,14 @@ for(l in 1:NROW(lambda)) { # for each lambda
     curacc<-accuracyfunc(trdat, trlab, alpha, beta)
     accuracies[l]<-curacc
     
-    plot(xplot, yplot, 	xlab="steps", ylab="accuracy")
+    #plot(xplot, yplot, 	xlab="steps", ylab="accuracy", type='p')
     
   } # epoch
   
   # generate plot for plotaccuracies (30 steps per point)
   # x: number of steps
   # y: accuracy (0 to 1)
-  plot(xplotaccuracies,yplotaccuracies)
+  plot(xplotaccuracies,yplotaccuracies,type='p')
   title(main = paste("lambda = ", lambda[l]))
   
   # code to test lambdas on validation
@@ -175,3 +175,5 @@ for(l in 1:NROW(lambda)) { # for each lambda
   
 } # lambda
 # report best lambda
+
+plot(lambda, lambdaaccuracies)
