@@ -28,6 +28,25 @@ wdat<-read.csv('adult.data', header=FALSE)
 library(klaR)
 library(caret)
 bigx<-wdat[c(1,3,5,11,12,13)] # continuous features
+
+mycolmeans<-colMeans(bigx, na.rm = FALSE, dims = 1)
+
+#mean-center data and scale by attriibute std dev
+#for(f in 1:NCOL(bigx)) { #for every feature
+  mymean<-sapply(bigx,mean,na.rm=FALSE)
+  mysd<-sapply(bigx,sd,na.rm=FALSE)
+  myoffsets<-t(t(bigx)-mymean)
+  myscales<-t(t(myoffsets)/mysd)
+  bigx<-myscales
+#   for(row in 1:NROW(bigx)) {
+#     old<-bigx[row, f]
+#     old<-old-mycolmeans[f]
+#     old<-old/mysd
+#     bigx[row, f]<-old
+#   }
+#}
+
+
 bigy<-wdat[,15] # labels
 bigy2<-matrix() #blank matrix
 
