@@ -166,7 +166,7 @@ for(l in 1:NROW(lambda)) { # for each lambda
   # generate plot for plotaccuracies (30 steps per point)
   # x: number of steps
   # y: accuracy (0 to 1)
-  plot(xplotaccuracies,yplotaccuracies,type='p')
+  plot(xplotaccuracies,yplotaccuracies,xlab="steps", ylab="accuracy",type='p')
   title(main = paste("lambda = ", lambda[l]))
   
   # code to test lambdas on validation
