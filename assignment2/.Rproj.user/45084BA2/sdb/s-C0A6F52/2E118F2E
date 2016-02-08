@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454909977863.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "2E118F2E",
+    "lastKnownWriteTime" : 7011605692497750387,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "3ulppga9gq",
+        "caption" : "accuracies",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=accuracies&cache_key=3ulppga9gq",
+        "displayedObservations" : 1,
+        "environment" : "",
+        "object" : "accuracies",
+        "totalObservations" : 1,
+        "variables" : 50
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

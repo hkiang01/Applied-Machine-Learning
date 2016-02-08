@@ -66,8 +66,8 @@ vallab<-otherlab[-test_indices] #validation labels
 # variables in global scope for debugging
 
 Ne<-50 # number epochs
-#Ns<-300 # number steps
-Ns<-1
+Ns<-300 # number steps
+#Ns<-1
 a<-0.01
 b<-50
 #exp(1) represents e
@@ -180,11 +180,11 @@ for(l in 1:NROW(lambda)) { # for each lambda
   lambdaaccuracies[l]<-curlambdaacc
     
   # store into global env
-  alphas[lc,]<-alpha
-  betas[lc]<-beta
-  accuracies_matrix[lc,]<-accuracies
-  yplotaccuracies_matrix[lc,]<-yplotaccuracies
-  xplotaccuracies_matrix[lc,]<-xplotaccuracies
+  #alphas[lc,]<-alpha
+  #betas[lc]<-beta
+  #accuracies_matrix[lc,]<-accuracies
+ # yplotaccuracies_matrix[lc,]<-yplotaccuracies
+  #xplotaccuracies_matrix[lc,]<-xplotaccuracies
   
   lc<-lc+1
 } # lambda
