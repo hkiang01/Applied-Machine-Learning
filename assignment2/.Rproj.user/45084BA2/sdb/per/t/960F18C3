@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1454913246538.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "960F18C3",
+    "lastKnownWriteTime" : 238934480,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "20h8mod5hb",
+        "caption" : "lambdaaccuracies",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=lambdaaccuracies&cache_key=20h8mod5hb",
+        "displayedObservations" : "1",
+        "environment" : "",
+        "object" : "lambdaaccuracies",
+        "totalObservations" : "1",
+        "variables" : "4"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}
