@@ -1,3 +1,5 @@
+# THIS IS USING THE NONLINEAR KERNEL FROM SVMLIGHT
+
 # housekeeping
 rm(list=ls())
 
@@ -12,24 +14,19 @@ wdat<-read.table('/Users/harry/projects/aml/assignment3/pubfig_dev_50000_pairs.t
 bigx<-wdat[,-c(1)] #drop col 1
 bigy<-as.factor(wdat[,1]) #coerce col 1 and store as factor (class label)
 
-trscore<-array(dim=10)
-testscore<-array(dim=10)
 # partition 80% of data for training
 wtd<-createDataPartition(y=bigy, p=.8, list=FALSE)
-# run svm to generate model
-svm<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment3/')
+# run svm to generate model using polynomial kernel (linear is default)
+svm<-svmlight(bigx[wtd,], bigy[wtd], svm.options = "-t 1", pathsvm='/Users/harry/projects/aml/assignment3/')
 
 # run on training data
 trlabels<-predict(svm, bigx[wtd,])
 trfoo<-trlabels$class
 # evaluate performance on training data
-trscore[wi]<-sum(trfoo==bigy[wtd])/(sum(trfoo==bigy[wtd])+sum(!(trfoo==bigy[wtd])))
+trscore<-sum(trfoo==bigy[wtd])/(sum(trfoo==bigy[wtd])+sum(!(trfoo==bigy[wtd])))
 
 # run on testing data (remaining 20%)
 labels<-predict(svm, bigx[-wtd,])
 foo<-labels$class
 #evaluate performance on test data
-testscore[wi]<-sum(foo==bigy[-wtd])/(sum(foo==bigy[-wtd])+sum(!(foo==bigy[-wtd])))
-
-trscoremean<-mean(trscore)
-testcoremean<-mean(testscore)
+testscore<-sum(foo==bigy[-wtd])/(sum(foo==bigy[-wtd])+sum(!(foo==bigy[-wtd])))
