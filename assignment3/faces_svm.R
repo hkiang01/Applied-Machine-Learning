@@ -7,7 +7,7 @@ library(caret)
 
 # import data
 # http://www.portfolioprobe.com/user-area/documentation/portfolio-probe-cookbook/data-basics/read-a-tab-separated-file-into-r/
-wdat<-read.table('pubfig_dev_50000_pairs.txt')
+wdat<-read.table('/Users/harry/projects/aml/assignment3/pubfig_dev_50000_pairs.txt')
 # v1 is label, rest (v2-v147) are features
 bigx<-wdat[,-c(1)] #drop col 1
 bigy<-as.factor(wdat[,1]) #coerce col 1 and store as factor (class label)
@@ -21,16 +21,16 @@ for (wi in 1:10) {
   svm<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment3/')
   
   # run on training data
-  trlabels<-predict(svm, bigy[wtd,])
+  trlabels<-predict(svm, bigx[wtd,])
   trfoo<-trlabels$class
   # evaluate performance on training data
-  trscore<-sum(trfoo==bigy[wtd])/(sum(trfoo==bigy[wtd])+sum(!(trfoo==bigy[wtd])))
+  trscore[wi]<-sum(trfoo==bigy[wtd])/(sum(trfoo==bigy[wtd])+sum(!(trfoo==bigy[wtd])))
   
   # run on testing data (remaining 20%)
   labels<-predict(svm, bigx[-wtd,])
   foo<-labels$class
   #evaluate performance on test data
-  testscore<-sum(foo==bigy[-wtd])/(sum(foo==bigy[-wtd])+sum(!(foo==bigy[-wtd])))
+  testscore[wi]<-sum(foo==bigy[-wtd])/(sum(foo==bigy[-wtd])+sum(!(foo==bigy[-wtd])))
 }
 trscoremean<-mean(trscore)
-tescoremean<-mean(tescore)
+testcoremean<-mean(testcore)
