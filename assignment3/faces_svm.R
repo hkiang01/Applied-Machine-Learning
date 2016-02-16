@@ -21,7 +21,7 @@ for (wi in 1:10) {
   svm<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment3/')
   
   # run on training data
-  trlabels<-predict(svm, features[wtd,])
+  trlabels<-predict(svm, bigy[wtd,])
   trfoo<-trlabels$class
   # evaluate performance on training data
   trscore<-sum(trfoo==bigy[wtd])/(sum(trfoo==bigy[wtd])+sum(!(trfoo==bigy[wtd])))
