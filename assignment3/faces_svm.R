@@ -13,7 +13,7 @@ bigx<-wdat[,-c(1)] #drop col 1
 bigy<-as.factor(wdat[,1]) #coerce col 1 and store as factor (class label)
 
 trscore<-array(dim=10)
-testcore<-array(dim=10)
+testscore<-array(dim=10)
 for (wi in 1:10) {
   # partition 80% of data for training
   wtd<-createDataPartition(y=bigy, p=.8, list=FALSE)
@@ -33,4 +33,4 @@ for (wi in 1:10) {
   testscore[wi]<-sum(foo==bigy[-wtd])/(sum(foo==bigy[-wtd])+sum(!(foo==bigy[-wtd])))
 }
 trscoremean<-mean(trscore)
-testcoremean<-mean(testcore)
+testcoremean<-mean(testscore)
