@@ -73,4 +73,4 @@ eval_dat<-read.table('pubfig_kaggle_eval.txt')
 eval_labels<-predict(svm1, eval_dat)
 eval_foo<-eval_labels$class
 eval_res<-as.numeric(as.character(eval_foo))
-write.table(eval_res, file="pubfig_kaggle_eval_results.txt")
+write.table(eval_res, file="pubfig_kaggle_eval_results.txt", quote=FALSE, sep=",")
