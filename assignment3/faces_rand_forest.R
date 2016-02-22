@@ -32,25 +32,26 @@ colnames(valdat1) <- colnames(bigx)
 colnames(valdat2) <- colnames(bigx)
 colnames(valdat3) <- colnames(bigx)
 
-val1Result <- predict(model, valdat1)
-val2Result <- predict(model, valdat2)
-val3Result <- predict(model, valdat3)
-
-solutions1<-read.table('pubfig_kaggle_1_solution.txt', sep=",", header=TRUE)
-solutions2<-read.table('pubfig_kaggle_2_solution.txt', sep=",", header=TRUE)
-solutions3<-read.table('pubfig_kaggle_3_solution.txt', sep=",", header=TRUE)
-
-sol1<-as.numeric(as.character(solutions1[,2])) #coerce col 2 and store as factor (class label)
-sol2<-as.numeric(as.character(solutions2[,2])) #coerce col 2 and store as factor (class label)
-sol3<-as.numeric(as.character(solutions3[,2])) #coerce col 2 and store as factor (class label)
-
-testscore1<-sum(val1Result==sol1)/length(val1Result)
-testscore2<-sum(val2Result==sol2)/length(val2Result)
-testscore3<-sum(val3Result==sol3)/length(val3Result)
+# val1Result <- predict(model, valdat1)
+# val2Result <- predict(model, valdat2)
+# val3Result <- predict(model, valdat3)
+# 
+# solutions1<-read.table('pubfig_kaggle_1_solution.txt', sep=",", header=TRUE)
+# solutions2<-read.table('pubfig_kaggle_2_solution.txt', sep=",", header=TRUE)
+# solutions3<-read.table('pubfig_kaggle_3_solution.txt', sep=",", header=TRUE)
+# 
+# sol1<-as.numeric(as.character(solutions1[,2])) #coerce col 2 and store as factor (class label)
+# sol2<-as.numeric(as.character(solutions2[,2])) #coerce col 2 and store as factor (class label)
+# sol3<-as.numeric(as.character(solutions3[,2])) #coerce col 2 and store as factor (class label)
+# 
+# testscore1<-sum(val1Result==sol1)/length(val1Result)
+# testscore2<-sum(val2Result==sol2)/length(val2Result)
+# testscore3<-sum(val3Result==sol3)/length(val3Result)
 trAccuracy = sum(trResult == trBigY)/length(trBigY)
 
 eval_dat<-read.table('pubfig_kaggle_eval.txt')
 colnames(eval_dat) <- colnames(bigx)
 eval_labels<-predict(model, eval_dat)
-eval_res<-as.numeric(as.character(eval_labels))
-write.table(eval_res, file="pubfig_kaggle_eval_results_randFor.txt", quote=FALSE, sep=",")
+eval_res <- data.frame(0:(length(eval_labels)-1))
+eval_res$new.col<-as.numeric(as.character(eval_labels))
+write.table(eval_res, file="pubfig_kaggle_eval_results_linsvm.txt", quote=FALSE, sep=",",  row.names = F)
