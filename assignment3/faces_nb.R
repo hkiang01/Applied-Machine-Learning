@@ -47,6 +47,7 @@ lvwte<-ptelogs>ntelogs
 
 eval_res <- data.frame(0:(length(lvwte)-1))
 eval_res$new.col<-lvwte
+colnames(eval_res) <- c("Id", "Prediction")
 write.table(eval_res, file="pubfig_kaggle_eval_results_naivebayes.txt", quote=FALSE, sep=",",  row.names = F)
 
 
