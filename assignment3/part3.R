@@ -3,8 +3,6 @@
 # housekeeping
 rm(list=ls())
 
-setwd('/Users/harry/projects/aml/assignment3/')
-
 # libraries
 library(klaR)
 library(caret)
@@ -19,16 +17,15 @@ bigy<-as.factor(wdat[,1]) #coerce col 1 and store as factor (class label)
 
 
 # partition 80% of data for training
-wtd<-createDataPartition(y=bigy, p=.8, list=FALSE)
 # run svm to generate model using polynomial kernel (linear is default)
-svm<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment3') #svm.options = "-t 1",
-svm1<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment3', svm.options = "-t 1") #svm.options = "-t 1",
+#svm<-svmlight(bigx[wtd,], bigy[wtd], pathsvm='/Users/harry/projects/aml/assignment3') #svm.options = "-t 1",
+svm1<-svmlight(bigx, bigy, svm.options = "-t 1") #svm.options = "-t 1",
 
 # # run on training data
-# trlabels<-predict(svm, bigx[wtd,])
-# trfoo<-trlabels$class
-# # evaluate performance on training data
-# trscore<-sum(trfoo==bigy[wtd])/(sum(trfoo==bigy[wtd])+sum(!(trfoo==bigy[wtd])))
+trlabels<-predict(svm, bigx)
+trfoo<-trlabels$class
+# evaluate performance on training data
+trscore<-sum(trfoo==bigy)/length(bigy)
 # 
 # # run on testing data (remaining 20%)
 # labels<-predict(svm, bigx[-wtd,])
