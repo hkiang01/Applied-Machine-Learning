@@ -35,7 +35,7 @@ ntrscales<-t(t(ntroffsets)/ntrsd)
 ntrlogs<--(1/2)*rowSums(apply(ntrscales,c(1, 2), function(x)x^2), na.rm=TRUE)-sum(log(ntrsd))
 lvwtr<-ptrlogs>ntrlogs #note that addition of log of prior is unecessary as they are both about equal
 gotrighttr<-lvwtr==ntrby #true if classification got right answer, false else
-trscore[wi]<-sum(gotrighttr)/(sum(gotrighttr)+sum(!gotrighttr)) # performance of classifier on splits
+trscore<-sum(gotrighttr)/(sum(gotrighttr)+sum(!gotrighttr)) # performance of classifier on splits
 # perform classification on test data
 pteoffsets<-t(t(ntebx)-ptrmean)
 ptescales<-t(t(pteoffsets)/ptrsd)
