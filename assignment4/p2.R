@@ -21,9 +21,13 @@ for (j in 1:NCOL(bigx3)) {
   for (k in 1:NCOL(bigx3)) {
     x_j<-as.matrix(bigx3[,c(j)])
     x_k<-as.matrix(t(bigx3[,c(k)]))
-    a<-(x_j*t(x_k))
-    b<-sum(a)
-    covmat[,c(j)][k]<-b
+    val<-sum((x_j*t(x_k)))
+    val<-val/NCOL(bigx3)
+    covmat[,c(j)][k]<-val
   }
 }
 
+eigendat<-eigen(covmat)
+eigenvalues<-eigendat$values
+eigenvalues_sorted<-sort(eigenvalues)
+plot(eigenvalues_sorted)
