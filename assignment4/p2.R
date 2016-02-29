@@ -6,6 +6,7 @@ bigy<-wdat[,1]
 bigx2<-scale(bigx, center=TRUE, scale=TRUE)
 
 # PART A
+# see figure 3.34 in section 3.7
 x_nipals<-nipals(bigx2, ncomp=10) #the first eigenvaue is much larger
 eigvalues<-x_nipals$eig
 plot(eigvalues)
@@ -13,6 +14,7 @@ plot(eigvalues)
 # based on visual analysis as on bottom of page 81 in 2/16 version of notes
 
 # PART B
+# see figure 3.34 in section 3.7
 # stem plotting function from: http://www.r-bloggers.com/matlab-style-stem-plot-with-r/
 # created by Matti Pastell
 attrib_labels<-c("Alcohol", "Malic acid", "Ash", "Alcalinity of ash",
@@ -37,3 +39,22 @@ eigvectors<-x_nipals_selected$p
 for(i in 1:NCOL(eigvectors)) {
   stem(eigvectors[,i],eig_iter=i)
 }
+
+# PART C
+# see figure 3.27 left graph in section 3.6
+x_nipals_selected<-nipals(bigx2, ncomp=2)
+bigx3<-t(bigx2) #iterate through cols (each col is a dp)
+x_coord<-matrix(data=0, ncol=NCOL(bigx3))
+y_coord<-matrix(data=0, ncol=NCOL(bigx3))
+# labels are in bigy
+for(i in 1:NCOL(bigx3)) {
+  x_coord[i]<-sum(x_nipals_selected$p[,c(1)]*bigx3[,c(i)])
+  y_coord[i]<-sum(x_nipals_selected$p[,c(2)]*bigx3[,c(i)])
+}
+wdat$color="black"
+wdat$color[wdat[,1]==2]="red"
+wdat$color[wdat[,1]==3]="blue"
+plot(x_coord,y_coord,col=wdat$color,main="Wine Recognition plotted on two principal components",
+     xlab="First principal component", ylab="Second principal component")
+legend(2,-2,c("class 1", "class 2", "class3"),col=c("black", "red", "blue"),pch=1)
+# specify pch for plot and legend for filling in circles
