@@ -8,8 +8,8 @@ bigx2<-scale(bigx, center=TRUE, scale=TRUE)
 # PART A
 # see figure 3.34 in section 3.7
 x_nipals<-nipals(bigx2, ncomp=10) #the first eigenvaue is much larger
-eigvalues<-x_nipals$eig
-plot(eigvalues)
+Eigvalues<-x_nipals$eig
+plot(Eigvalues,main="Eigenvalues of covariance matrix in sorted order from NIPALS")
 # 4-7 components are good
 # based on visual analysis as on bottom of page 81 in 2/16 version of notes
 
