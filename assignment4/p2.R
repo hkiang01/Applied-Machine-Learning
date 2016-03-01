@@ -56,5 +56,5 @@ wdat$color[wdat[,1]==2]="red"
 wdat$color[wdat[,1]==3]="blue"
 plot(x_coord,y_coord,col=wdat$color,main="Wine Recognition plotted on two principal components",
      xlab="First principal component", ylab="Second principal component")
-legend(2,-2,c("class 1", "class 2", "class3"),col=c("black", "red", "blue"),pch=1)
+legend(2,-2,c("class 1", "class 2", "class 3"),col=c("black", "red", "blue"),pch=1)
 # specify pch for plot and legend for filling in circles
