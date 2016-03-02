@@ -10,9 +10,10 @@
 
 # (a) Plot this dataset on the first three principal components, using different
 # markers for benign and malignant cases. What do you see?
-
-library(caret)
-library(chemometrics)
+setwd('/Users/harry/projects/aml/assignment4/')
+library('caret')
+library('chemometrics')
+library('plsdepot')
 
 breast<-read.csv('wdbc.data', header=FALSE, sep=',')
 breast_att<-breast[c(3:32)]
@@ -47,3 +48,19 @@ write.table(b,file='b_score.csv',row.names=FALSE,col.names=FALSE)
 # mind that the most common error here is to forget that the X and the Y in
 # PLS1 are centered - i.e. we subtract the mean. Once you have computed
 # the first (etc.) direction, you should subtract it from X , but leave Y alone.
+plsdat<-plsreg1(breast_scaled, breast_label, comps=2)
+raw_weights<-plsdat$raw.wgs
+adj_weights<-plsdat$mod.wgs
+breast_scaled_t<-t(breast_scaled)
+x_coord<-matrix(data=0, ncol=NCOL(breast_scaled))
+y_coord<-matrix(data=0, ncol=NCOL(breast_scaled))
+for(i in 1:NCOL(breast_scaled_t)) {
+  x_coord[i]<-sum(raw_weights[,c(1)]*breast_scaled_t[,c(i)])
+  y_coord[i]<-sum(raw_weights[,c(2)]*breast_scaled_t[,c(i)])
+  #x_coord[i]<-sum(adj_weights[,c(1)]*breast_scaled_t[,c(i)])
+  #y_coord[i]<-sum(adj_weights[,c(2)]*breast_scaled_t[,c(i)])
+}
+breast$color="red" #1 is tumor
+breast$color[breast[,c(2)]=="M"]="green" #2 is malignant
+plot(x_coord, y_coord, col=breast$color, main="Breast Cancer Data on two PLS1 discriminate directions",
+     xlab="Direction 1", ylab="Direction 2")
