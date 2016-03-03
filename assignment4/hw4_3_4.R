@@ -19,7 +19,6 @@ grapihc = splom(irisdat[,c(1:4)], groups=irisdat$V5, par.settings=parset,
 print(grapihc)
 
 #PCA
-library(mixOmics)
 means = apply(numiris, 2, mean)
 sds = apply(numiris, 2, sd)
 
@@ -29,16 +28,18 @@ for (i in 1:4){
   normiris[,i] = (numiris[,i] - means[i])/sds[i]
 }
 
-a = mixOmics::nipals(normiris,ncomp = 2, reconst = TRUE)
+svdRet = svd(normiris, nv = 2)
 
 # is this how you project into principal components? I'm honestly not sure but it sorta works out sorta?
-T = t(data.matrix(a$p)) %*% t(data.matrix(normiris))
+T = t(data.matrix(svdRet$v)) %*% t(data.matrix(normiris))
 T = t(T)
 #g = plot(T, groups=irisdat$V5, key = list(text=list(speciesnames), points=list(pch=pchr), columns = 3))
-g = xyplot(T[, 2] ~ T[,1], groups=irisdat$V5, par.settings=parset,
-                key = list(text=list(speciesnames), points=list(pch=pchr), columns = 3),
-           xlab='First Principal Component', ylab = 'Second Principal Component', main='Iris Data Projected on 2 Principal Comp')
-print(g)
+color <- matrix("black", 150, 1)
+color[irisdat[, 5] == "Iris-versicolor"] = "red"
+color[irisdat[, 5] == "Iris-virginica"] = "blue"
+plot(T,col=color,main="Iris data plotted on two primary components",
+     xlab="First primary component", ylab="Second primary component")
+legend(2,2.7,c("setosa", "versicolor", "virginica"),col=c("black", "red", "blue"),pch=1)
 
 
 #c
