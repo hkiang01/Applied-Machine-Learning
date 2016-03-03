@@ -53,12 +53,13 @@ iris_scaled_t<-t(normiris)
 x_coord<-matrix(data=0, ncol=NCOL(iris_scaled_t))
 y_coord<-matrix(data=0, ncol=NCOL(iris_scaled_t))
 for(i in 1:NCOL(iris_scaled_t)) {
-  x_coord[i]<-sum(raw_weights[,c(1)]*iris_scaled_t[,c(i)])
-  y_coord[i]<-sum(raw_weights[,c(2)]*iris_scaled_t[,c(i)])
-  #x_coord[i]<-sum(adj_weights[,c(1)]*breast_scaled_t[,c(i)])
-  #y_coord[i]<-sum(adj_weights[,c(2)]*breast_scaled_t[,c(i)])
+  x_coord[i]<-sum(adj_weights[,c(1)]*iris_scaled_t[,c(i)])
+  y_coord[i]<-sum(adj_weights[,c(2)]*iris_scaled_t[,c(i)])
 }
-adx = xyplot(y_coord ~ x_coord, par.settings=parset,
-           key = list(text=list(speciesnames), points=list(pch=pchr), columns = 3),
-           xlab='First Principal Component', ylab = 'Second Principal Component', main='PSL2')
-print(adx)
+color <- matrix("black", 150, 1)
+color[y_label[,2] == 1] <- "red"
+color[y_label[,3] == 1] <- "blue"
+
+plot(x_coord,y_coord,col=color,main="Iris data plotted on Two discriminate directions",
+     xlab="First discriminate direction", ylab="Second discriminate direction")
+legend(0.2,2.7,c("setosa", "versicolor", "virginica"),col=c("black", "red", "blue"),pch=1)
