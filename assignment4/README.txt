@@ -5,7 +5,7 @@ Open RStudio.
 setwd('/directory/of/project')
 source('project_file.R')
 
-MATLAB files:
+MATLAB files (used for 3.7):
 Open MATLAB
 load "wdbc.m" to workspace
 run program
