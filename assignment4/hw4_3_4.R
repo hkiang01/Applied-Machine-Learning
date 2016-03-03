@@ -49,15 +49,17 @@ y_label[, 3] = irisdat[, 5] == "Iris-virginica"
 plsdat<-plsreg2(normiris, y_label, comps=2)
 raw_weights<-plsdat$raw.wgs
 adj_weights<-plsdat$mod.wgs
+xloads<-plsdat$x.loads
 iris_scaled_t<-t(normiris)
 x_coord<-matrix(data=0, ncol=NCOL(iris_scaled_t))
 y_coord<-matrix(data=0, ncol=NCOL(iris_scaled_t))
 for(i in 1:NCOL(iris_scaled_t)) {
-  x_coord[i]<-sum(raw_weights[,c(1)]*iris_scaled_t[,c(i)])
-  y_coord[i]<-sum(raw_weights[,c(2)]*iris_scaled_t[,c(i)])
+  #x_coord[i]<-sum(raw_weights[,c(1)]*iris_scaled_t[,c(i)])
+  #y_coord[i]<-sum(raw_weights[,c(2)]*iris_scaled_t[,c(i)])
   #x_coord[i]<-sum(adj_weights[,c(1)]*breast_scaled_t[,c(i)])
   #y_coord[i]<-sum(adj_weights[,c(2)]*breast_scaled_t[,c(i)])
-}
+  x_coord[i]<-sum(xloads[,c(1)]*iris_scaled_t[,c(i)])
+  y_coord[i]<-sum(xloads[,c(2)]*iris_scaled_t[,c(i)])}
 adx = xyplot(y_coord ~ x_coord, par.settings=parset,
            key = list(text=list(speciesnames), points=list(pch=pchr), columns = 3),
            xlab='First Principal Component', ylab = 'Second Principal Component', main='PSL2')
