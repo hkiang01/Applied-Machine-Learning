@@ -67,6 +67,7 @@ write.table(zba,file='breast_results/zba.csv',row.names=FALSE,col.names=FALSE)
 plsdat<-plsreg1(breast_scaled, breast_label, comps=3)
 raw_weights<-plsdat$raw.wgs
 adj_weights<-plsdat$mod.wgs
+xloads<-plsdat$x.loads
 breast_scaled_t<-t(breast_scaled)
 
 xb<-matrix(data=0, ncol=NCOL(breast_scaled_t))
@@ -77,10 +78,12 @@ for(i in 1:NCOL(breast_scaled_t)) {
 #   xb[i]<-sum(raw_weights[,c(1)]*breast_scaled_t[,c(i)])
 #   yb[i]<-sum(raw_weights[,c(2)]*breast_scaled_t[,c(i)])
 #   zb[i]<-sum(raw_weights[,c(3)]*breast_scaled_t[,c(i)])
-  xb[i]<-sum(adj_weights[,c(1)]*breast_scaled_t[,c(i)])
-  yb[i]<-sum(adj_weights[,c(2)]*breast_scaled_t[,c(i)])
-  zb[i]<-sum(adj_weights[,c(3)]*breast_scaled_t[,c(i)])
-}
+  #xb[i]<-sum(adj_weights[,c(1)]*breast_scaled_t[,c(i)])
+  #yb[i]<-sum(adj_weights[,c(2)]*breast_scaled_t[,c(i)])
+  #zb[i]<-sum(adj_weights[,c(3)]*breast_scaled_t[,c(i)])
+  xb[i]<-sum(xloads[,c(1)]*breast_scaled_t[,c(i)])
+  yb[i]<-sum(xloads[,c(2)]*breast_scaled_t[,c(i)])
+  zb[i]<-sum(xloads[,c(3)]*breast_scaled_t[,c(i)])}
 
 xb<-t(xb)
 yb<-t(yb)
@@ -100,7 +103,8 @@ write.table(zmb,file='breast_results/zmb.csv',row.names=FALSE,col.names=FALSE)
 write.table(xbb,file='breast_results/xbb.csv',row.names=FALSE,col.names=FALSE)
 write.table(ybb,file='breast_results/ybb.csv',row.names=FALSE,col.names=FALSE)
 write.table(zbb,file='breast_results/zbb.csv',row.names=FALSE,col.names=FALSE)
-
-# open3d(params=(windowRect=c(100,50,150,200)))
-# plot3d(x_coord, y_coord, z_coord, col=breast$color, main="Breast Cancer Data Using PLS1",
-     # xlab="Direction 1", ylab="Direction 2", zlab="Direction 3")
+breast$color="red" #1 is tumor
+breast$color[breast[,c(2)]=="M"]="green" #2 is malignant
+ open3d(params=(windowRect=c(100,50,150,200)))
+ plot3d(xb, yb, zb, col=breast$color, main="Breast Cancer Data Using PLS1",
+      xlab="Direction 1", ylab="Direction 2", zlab="Direction 3")
