@@ -12,6 +12,13 @@ run program
 
 
 
+3.5
+Source code: “p2.R”
+	Libraries: “mixOmics” for nipals
+	Run source code p2.R in RStudio
+	Install missing packages from Tools → Install Packages...
+	Notes: Credit to Matti Pastell for stem plot algorithm http://www.r-bloggers.com/matlab-style-stem-plot-with-r/ 
+
                         _,-' - `--._
                       ,'.:  __' _..-)
                     ,'     /,o)'  ,'
