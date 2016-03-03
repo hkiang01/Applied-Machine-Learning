@@ -2,24 +2,38 @@
 %load = csvread('nipals_load.csv');
 %label = csvread('nipals_label.csv');
 
-m = csvread('m_score.csv');
-b = csvread('b_score.csv');
+xma = csvread('breast_results/xma.csv');
+yma = csvread('breast_results/yma.csv');
+zma = csvread('breast_results/zma.csv');
+xba = csvread('breast_results/xba.csv');
+yba = csvread('breast_results/yba.csv');
+zba = csvread('breast_results/zba.csv');
+
+xmb = csvread('breast_results/xmb.csv');
+ymb = csvread('breast_results/ymb.csv');
+zmb = csvread('breast_results/zmb.csv');
+xbb = csvread('breast_results/xbb.csv');
+ybb = csvread('breast_results/ybb.csv');
+zbb = csvread('breast_results/zbb.csv');
 
 % separate into benign/malignant
 
-xm = m(:,1);
-ym = m(:,2);
-zm = m(:,3);
-
-xb = b(:,1);
-yb = b(:,2);
-zb = b(:,3);
-
 figure(1);
 hold on;
-hm = scatter3(xm,ym,zm,[],'r');
-hb = scatter3(xb,yb,zb,[],'g');
+hma = scatter3(xma,yma,zma,[],'r');
+hba = scatter3(xba,yba,zba,[],'g');
 hold off;
+title('Breast Cancer Data Using PCA');
 xlabel('PCA 1');
 ylabel('PCA 2');
 zlabel('PCA 3');
+
+figure(2);
+hold on;
+hmb = scatter3(xmb,ymb,zmb,[],'r');
+hbb = scatter3(xbb,ybb,zbb,[],'g');
+hold off;
+title('Breast Cancer Data Using PLS1');
+xlabel('PLS 1');
+ylabel('PLS 2');
+zlabel('PLS 3');
