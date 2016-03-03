@@ -10,6 +10,11 @@ Open MATLAB
 load project file to workspace
 run program
 
+3.4
+Source code: “hw4_3_4.R”
+  Libraries: "latice", "caret", "chemometrics", "plsdepot"
+  Run source code hw4_3_4.R in RStudio
+  Install missing packages from Tools → Install Packages...
 
 
 3.5
