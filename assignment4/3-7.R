@@ -103,8 +103,8 @@ write.table(zmb,file='breast_results/zmb.csv',row.names=FALSE,col.names=FALSE)
 write.table(xbb,file='breast_results/xbb.csv',row.names=FALSE,col.names=FALSE)
 write.table(ybb,file='breast_results/ybb.csv',row.names=FALSE,col.names=FALSE)
 write.table(zbb,file='breast_results/zbb.csv',row.names=FALSE,col.names=FALSE)
-breast$color="red" #1 is tumor
-breast$color[breast[,c(2)]=="M"]="green" #2 is malignant
- open3d(params=(windowRect=c(100,50,150,200)))
- plot3d(xb, yb, zb, col=breast$color, main="Breast Cancer Data Using PLS1",
-      xlab="Direction 1", ylab="Direction 2", zlab="Direction 3")
+# breast$color="red" #1 is tumor
+# breast$color[breast[,c(2)]=="M"]="green" #2 is malignant
+#  open3d(params=(windowRect=c(100,50,150,200)))
+#  plot3d(xb, yb, zb, col=breast$color, main="Breast Cancer Data Using PLS1",
+#       xlab="Direction 1", ylab="Direction 2", zlab="Direction 3")
