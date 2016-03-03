@@ -24,6 +24,13 @@ Source code: “p2.R”
 	Run source code p2.R in RStudio
 	Install missing packages from Tools → Install Packages...
 	Notes: Credit to Matti Pastell for stem plot algorithm http://www.r-bloggers.com/matlab-style-stem-plot-with-r/ 
+	
+3.7
+Source code: “3-7.R”, "wdbc.m"
+  Libraries: "mixOmics", "caret", "plot3Drgl", "plsdepot"
+  Run source code 3-7.R in RStudio
+  Install missing packages from Tools → Install Packages...
+  Run source code wdbc.m in MATLAB
 
                         _,-' - `--._
                       ,'.:  __' _..-)
