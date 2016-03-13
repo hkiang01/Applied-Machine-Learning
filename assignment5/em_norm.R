@@ -1,46 +1,72 @@
+library(jpeg)
+library(ForeCA)
+img = readJPEG("test_images/balloons.jpg", native = FALSE)
+writeJPEG(img, target = "a.jpg", quality = 1, bg = "white")
 
-itNum <- 100
-N <- 2  #number of clusters
+itNum <- 30
+N <- 50  #number of clusters
 
-xdatRaw <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2)
+red <- img[,,1]
+green <- img[,,2]
+blue <- img[,,3]
+
+imgH = nrow(red)
+imgW = ncol(red)
+
+dim(red) <- NULL
+dim(green) <- NULL
+dim(blue) <- NULL
+
+xdatRaw <- matrix(0, length(red), 3)
+xdatRaw[,1] <- red
+xdatRaw[,2] <- green
+xdatRaw[,3] <- blue
+
 d <- ncol(xdatRaw)
 n <- nrow(xdatRaw)
 
-datMean <- apply(xdatRaw, 2, mean)
-datSD <- apply(xdatRaw, 2, sd)
+xdat <- whiten(xdatRaw)$U
 
-xdat <- xdatRaw
-for (i in 1:d){
-  xdat[ ,i] = (xdatRaw[,i] - datMean[i] )/datSD[i]
-}
-
+xdat <- xdat * 5
 
 piProb <- rep(1/N, N)# N elements
 weight <- matrix(0, n, N) # n by N
 distMean <- matrix(0, N, d) # N by d
 
 #initialize means
-#randChoice <- sample(1:n, N, replace=FALSE)
-randChoice <- c(1,5)
+randChoice <- sample(1:n, N, replace=FALSE)
 for (i in 1:N){
   r <- randChoice[i]
   distMean[i, ] <- xdat[r,]
 }
 
 for(it in 1:itNum){
+  print(it)
   
   # calculate weights
-  for (i in 1:n){
-    for (j in 1:N){
-      x = xdat[i, ]
-      numerator <- exp(-1/2 * t(x - distMean[j, ]) %*% (x - distMean[j, ])) * piProb[j]
-      denomSum <- 0
-      for (k in 1:N){
-        denomSum = denomSum + exp(-1/2 * t(x - distMean[k]) %*% (x - distMean[k])) * piProb[k]
-      }
-      weight[i, j] = numerator / denomSum
-    }
+#   for (i in 1:n){
+#     for (j in 1:N){
+#       x = xdat[i, ]
+#       numerator <- exp(-1/2 * t(x - distMean[j, ]) %*% (x - distMean[j, ])) * piProb[j]
+#       denomSum <- 0
+#       for (k in 1:N){
+#         denomSum = denomSum + exp(-1/2 * t(x - distMean[k]) %*% (x - distMean[k])) * piProb[k]
+#       }
+#       weight[i, j] = numerator / denomSum
+#     }
+#   }
+  denomSum <- rep(0, i)
+  for (j in 1:N){
+    x = xdat
+    difference = t(t(x) - distMean[j,])
+    distance = rowSums(difference^2)
+    
+    numerator <- exp(-1/2 * distance) * piProb[j]
+
+    weight[, j] = numerator
+    denomSum <- denomSum + numerator
   }
+  weight <- weight/denomSum
   
   #M step
   #calculate means of the cluster distributions
@@ -55,3 +81,31 @@ for(it in 1:itNum){
     piProb[j] = weightSum/n;
   }
 }
+
+denomSum <- rep(0, i)
+for (j in 1:N){
+  x = xdat
+  difference = t(t(x) - distMean[j,])
+  distance = rowSums(difference^2)
+  
+  numerator <- exp(-1/2 * distance) * piProb[j]
+  
+  weight[, j] = numerator
+  denomSum <- denomSum + numerator
+}
+weight <- weight/denomSum
+clusters <- apply(weight, 1, which.max)
+
+output = xdatRaw
+for (i in 1:N){
+  x = xdatRaw[clusters == i,]
+  newMean <- apply(x, 2, mean)
+  output[clusters == i, 1] = newMean[1]
+  output[clusters == i, 2] = newMean[2]
+  output[clusters == i, 3] = newMean[3]
+}
+
+
+dim(output) <- c(imgH, imgW, 3)
+
+writeJPEG(output, target = "a.jpg", quality = 1, bg = "white")
