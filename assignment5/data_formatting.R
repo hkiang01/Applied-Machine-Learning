@@ -10,7 +10,6 @@ docword<-t(docword)
 numDataPoints<-as.numeric(docword[,c(ncol(docword))][1])
 dataFormatted<-matrix(data=0, numDataPoints, numFeatures)
 
-#line<-1 for debugging
 for(line in 1:ncol(docword)) {
   item<-docword[,c(line)]
   docId<-as.numeric(item[1])
@@ -22,3 +21,27 @@ for(line in 1:ncol(docword)) {
   newVal<-oldVal+wordCount
   dataFormatted[,c(wordId)][docId]<-newVal
 }
+
+#remove zero columns
+goodCols<-array(0,0,0)
+zeroCols<-array(0,0,0)
+
+for(col in 1:ncol(dataFormatted)) {
+  curCol<-dataFormatted[,c(col)]
+  allZeroes<-TRUE
+  for(rowElem in 1:length(curCol)) {
+    curElem<-curCol[rowElem]
+    if(curElem!=0) {
+      allZeroes<-FALSE
+      break
+    }
+  }
+  
+  if(allZeroes==TRUE) {
+    zeroCols<-cbind(zeroCols,col)
+  } else {
+    goodCols<-cbind(goodCols,col)
+  }
+}
+
+xdat<-dataFormatted[,c(goodCols)]
