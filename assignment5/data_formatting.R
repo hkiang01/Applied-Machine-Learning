@@ -24,7 +24,6 @@ for(line in 1:ncol(docword)) {
 
 #remove zero columns
 goodCols<-array(0,0,0)
-zeroCols<-array(0,0,0)
 
 for(col in 1:ncol(dataFormatted)) {
   curCol<-dataFormatted[,c(col)]
@@ -37,11 +36,12 @@ for(col in 1:ncol(dataFormatted)) {
     }
   }
   
-  if(allZeroes==TRUE) {
-    zeroCols<-cbind(zeroCols,col)
-  } else {
+  if(allZeroes==FALSE) {
     goodCols<-cbind(goodCols,col)
   }
 }
 
-xdat<-dataFormatted[,c(goodCols)]
+xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
+
+
+
