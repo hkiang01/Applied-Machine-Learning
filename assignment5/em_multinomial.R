@@ -16,36 +16,42 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
   xdat <- xdatRaw
     d <- ncol(xdat)
   n <- nrow(xdat)
-  clusterProb <- rep(1/N, N)# N elements
+  clusterProb <- rep(1/N, N)# N elements of all equal prob
   wordProb <- matrix(1/d, N, d) # N by d
   weight <- matrix(0, n, N) # n by N
   
   #initialize wordProb
-  randChoice <- sample(1:n, N, replace=FALSE)
-  for (i in 1:N){
-    r <- randChoice[i]
-    sumWords <- sum(xdat[r, ])
-    wordProb[i, ] <- xdat[r,] / sumWords
+  randChoice <- sample(1:n, N, replace=FALSE) #pick cluster number of random dp's
+  for (i in 1:N){ #for each cluster
+    r <- randChoice[i]#pick corresponding random row
+    sumWords <- sum(xdat[r, ]) #the row
+    wordProb[i, ] <- xdat[r,] / sumWords #prob for each word for each cluster
   }
   
+  #wordProb has the prob of each word for each cluster (random dp)
+
   for(it in 1:itNum){
     
     # calculate weights
-    for (i in 1:n){
-      for (j in 1:N){
-        x = xdat[i, ]
+    for (i in 1:n){ # for each dp
+      for (j in 1:N){ #for each cluster
+        x = xdat[i, ] # get the dp (the row)
+
+        #numerator <- clusterProb[j] # get the prior for cluster j
+        #for (k in 1:d){
+        #  numerator <- numerator * (wordProb[j, k] ^ x[k])
+        #  #numerator <- numerator * (wordProb[j, k] ^ xdat[i,k])
+        #}
+        numerator<-exp(sum(log(wordProb[j,])*xdat[i,]))*clusterProb[j]
         
-        numerator <- clusterProb[j]
         denomSum <- 0
-        for (k in 1:d){
-          numerator <- numerator * (wordProb[j, k] ^ x[k])
-        }
         for (l in 1:N){
-          denomProduct <- clusterProb[l]
-          for (k in 1:d){
-            denomProduct <- denomProduct * (wordProb[l,k] ^ x[k])
-          }
-          denomSum = denomSum + denomProduct
+          #denomProduct <- clusterProb[l]
+          #for (k in 1:d){
+          #  denomProduct <- denomProduct * (wordProb[l,k] ^ x[k])
+          #}
+          denomProduct<-exp(sum(log(wordProb[l,])*xdat[i,]))*clusterProb[l]
+          denomSum<-denomSum + denomProduct
         }
         weight[i, j] = numerator / denomSum
       }
@@ -110,5 +116,14 @@ for(col in 1:ncol(dataFormatted)) {
 }
 
 #MAIN
-xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
-ret <- em_multinomial(xdat, 30) #30 topics
+#xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
+xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
+ret <- em_multinomial(xdat, 2, itNum = 15) #30 topics
+
+# Note that every col corresponds to word id in goodCols
+#   (see remove zero columns)
+#   e.g., col 4 corresponds to 4th elem in goodCols
+#     and 4th elem in goodCols refers to corresponding word in vocab
+#     col 4 does NOT necessarily refer to corresponding word in vocab
+
+#translation from cols to goodCols to words
