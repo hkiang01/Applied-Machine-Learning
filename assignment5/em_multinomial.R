@@ -49,26 +49,33 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
         numArr<-cbind(numArr,numerator)
         numerator<-exp(numerator) #A_j
         
-        denomSum <- 0
-        denomArr<-array(0,0,0) #stores A_l for all clusters 1-l
-        for (l in 1:N){
-          #denomProduct <- clusterProb[l]
-          #for (k in 1:d){
-          #  denomProduct <- denomProduct * (wordProb[l,k] ^ x[k])
-          #}
-          denomProduct<-sum(log(wordProb[l,])*xdat[i,]) + log(clusterProb[l])
-          denomProduct<-exp(denomProduct)
-          #denomSum<-denomSum + exp(log(denomProduct))
-          denomArr<-cbind(denomArr,denomProduct)
-        }
-        denomSum<-sum(exp(log(denomArr))) #sums exp(log(A_l)))
-        
         #weight[i, j] = numerator / denomSum #Y
         #weight[i,j] <- log(weight[i,j]) #log(Y)
-        weight[i,j]<- log(numerator) - log(denomSum) #log(A_j) - log(sum(e^(log(A_l))))
+        weight[i,j]<- log(numerator) #- log(denomSum) #log(A_j) - ##log(sum(e^(log(A_l))))
         #note that M step operates on exp(log(Y))
         
         # weight[i,j] stores p(delta_i,j | theta^(n),x ) - see top of page 138 of march 3 notes
+      }
+      
+      logAMax<-max(numArr)
+      
+      denomSum <- 0
+      denomArr<-array(0,0,0) #stores A_l for all clusters 1-l
+      for (l in 1:N){
+        #denomProduct <- clusterProb[l]
+        #for (k in 1:d){
+        #  denomProduct <- denomProduct * (wordProb[l,k] ^ x[k])
+        #}
+        denomProduct<-sum(log(wordProb[l,])*xdat[i,]) + log(clusterProb[l]) # log(A_l)
+        denomProduct<-denomProduct - logAMax # log(A_l) - logAMax
+        denomProduct<-exp(denomProduct) # e^(log(A_l) - logAMax)
+        denomArr<-cbind(denomArr,denomProduct)
+      }
+      denomSum<- exp(logAMax)*sum(exp(log(denomArr))) #sums exp(log(A_l)))
+      
+      #subtract the log of the denominator
+      for(j in 1:N) {
+        weight[i,j]<-weight[i,j] - log(denomSum)
       }
 
     }
