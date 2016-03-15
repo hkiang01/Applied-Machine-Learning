@@ -80,9 +80,10 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
       denomSum<-denomSum1 - denomSum2
 
       #subtract the log of the denominator
-      for(j in 1:N) {
-        weight[i,j]<-weight[i,j] - denomSum
-      }
+      #for(j in 1:N) {
+        #weight[i,j]<-weight[i,j] - denomSum
+      #}
+      weight[i,]<-weight[i,]-denomSum
 
     }
     
