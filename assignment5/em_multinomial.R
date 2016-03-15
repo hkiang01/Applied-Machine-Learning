@@ -67,15 +67,21 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
         #  denomProduct <- denomProduct * (wordProb[l,k] ^ x[k])
         #}
         denomProduct<-sum(log(wordProb[l,])*xdat[i,]) + log(clusterProb[l]) # log(A_l)
-        denomProduct<-denomProduct - logAMax # log(A_l) - logAMax
+        denomProduct<-denomProduct - logAMax # log(A_l) - log(A_max)
         denomProduct<-exp(denomProduct) # e^(log(A_l) - logAMax)
         denomArr<-cbind(denomArr,denomProduct)
       }
-      denomSum<- exp(logAMax)*sum(exp(log(denomArr))) #sums exp(log(A_l)))
+      #denomSum<- exp(logAMax)*sum(exp(log(denomArr))) #e^(log(A_max)) * sum(e^(log(A_l)-log(A_max)))
+      #denomSum<-log(denomSum)
       
+      #denomSum1<-log(exp(logAMax))
+      denomSum1<-logAMax
+      denomSum2<-log(sum(exp(log(denomArr))))
+      denomSum<-denomSum1 - denomSum2
+
       #subtract the log of the denominator
       for(j in 1:N) {
-        weight[i,j]<-weight[i,j] - log(denomSum)
+        weight[i,j]<-weight[i,j] - denomSum
       }
 
     }
