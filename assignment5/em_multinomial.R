@@ -166,7 +166,7 @@ for(topic in 1:numTopics) {
   listOfWordsRow<-array("",0)
   for(tgc in 1:topGoodCols) {
     index<-goodCols[topGoodCols[tgc]] #goodCols lookup table (translation)
-    listOfWordsRow[tgc]<-tvocab[index]lolum
+    listOfWordsRow[tgc]<-tvocab[index]
   }
   listOfWordsRow<-na.omit(listOfWordsRow)
   #print(listOfWordsRow)
@@ -178,4 +178,6 @@ for(topic in 1:numTopics) {
 #plot(1:numTopics, ret$clusterProb, type="h")
 toPlot<-table(1:numTopics,ret$clusterProb)
 barplot(ret$clusterProb, main="Probability of Topics", 
-        xlab="Topic")
+        xlab="Topic", names.arg=c(1:numTopics))
+
+write.csv(listOfWords,file="Most_Common_Words_Per_Cluster.csv")
