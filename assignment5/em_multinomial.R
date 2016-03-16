@@ -3,6 +3,7 @@ vocab<-read.table('vocab.nips.txt') #vocab.[asdf].txt
 docword<-read.table('docword.nips.txt', skip=3) #docword.[asdf].txt
 wordProbConstant<-0.000001
 numTopics<-30
+topWordsPerTopic<-10
 
 #em_multinomial 
 # Parameters:
@@ -150,11 +151,27 @@ xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
 #xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
 ret <- em_multinomial(xdat, numTopics, itNum = 15) #30 topics
 
-#print(ret) #for debugging
 # Note that every col corresponds to word id in goodCols
 #   (see remove zero columns)
 #   e.g., col 4 corresponds to 4th elem in goodCols
 #     and 4th elem in goodCols refers to corresponding word in vocab
 #     col 4 does NOT necessarily refer to corresponding word in vocab
 
+
 #translation from cols to goodCols to words
+tvocab<-t(vocab)
+listOfWords<-array("",c(nrow(ret$wordProb),topWordsPerTopic))
+for(topic in 1:nrow(ret$wordProb)) {
+  topGoodCols<-order(ret$wordProb[topic,], decreasing = T)[1:topWordsPerTopic] #top 10 indices
+  listOfWordsRow<-array("",0)
+  for(tgc in 1:topGoodCols) {
+    index<-goodCols[topGoodCols[tgc]] #goodCols lookup table (translation)
+    listOfWordsRow[tgc]<-tvocab[index]
+  }
+  listOfWordsRow<-na.omit(listOfWordsRow)
+  #print(listOfWordsRow)
+  listOfWords[topic,]<-listOfWordsRow
+}
+
+#listWords[i,j] contains j'th most common word in i'th cluster
+
