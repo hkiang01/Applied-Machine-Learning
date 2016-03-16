@@ -2,7 +2,7 @@ setwd('/Users/harry/projects/aml/assignment5/')
 vocab<-read.table('vocab.nips.txt') #vocab.[asdf].txt
 docword<-read.table('docword.nips.txt', skip=3) #docword.[asdf].txt
 wordProbConstant<-0.000001
-
+numTopics<-30
 
 #em_multinomial 
 # Parameters:
@@ -66,32 +66,12 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
       }
       
       logAMax<-max(numArr)
-      
-      denomSum <- 0
-      denomArr<-array(0,0,0) #stores A_l for all clusters 1-l
-      for (l in 1:N){
-        #denomProduct <- clusterProb[l]
-        #for (k in 1:d){
-        #  denomProduct <- denomProduct * (wordProb[l,k] ^ x[k])
-        #}
-        denomProduct<-sum(log(wordProb[l,])*xdat[i,]) + log(clusterProb[l]) # log(A_l)
-        denomProduct<-denomProduct - logAMax # log(A_l) - log(A_max)
-        denomProduct<-exp(denomProduct) # e^(log(A_l) - logAMax)
-        denomArr<-cbind(denomArr,denomProduct)
-      }
-      #denomSum<- exp(logAMax)*sum(exp(log(denomArr))) #e^(log(A_max)) * sum(e^(log(A_l)-log(A_max)))
-      #denomSum<-log(denomSum)
-      
-      #denomSum1<-log(exp(logAMax))
-      denomSum1<-logAMax
-      denomSum2<-log(sum(exp(log(denomArr))))
-      denomSum<-denomSum1 - denomSum2
 
       #subtract the log of the denominator
       #for(j in 1:N) {
         #weight[i,j]<-weight[i,j] - denomSum
       #}
-      weight[i,]<-weight[i,]-denomSum #weight stores log(Y)
+      weight[i,]<-weight[i,]-logAMax - log(sum(exp(weight[i,] - logAMax))) #weight stores log(Y)
 
     }
     
@@ -166,8 +146,8 @@ if(processing_docs) {
 
 
 #MAIN
-xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
-#xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
+#xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
+xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
 ret <- em_multinomial(xdat, 2, itNum = 15) #30 topics
 
 #print(ret) #for debugging
