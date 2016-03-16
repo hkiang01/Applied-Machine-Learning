@@ -71,7 +71,7 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
       #for(j in 1:N) {
         #weight[i,j]<-weight[i,j] - denomSum
       #}
-      weight[i,]<-weight[i,]-logAMax - log(sum(exp(weight[i,] - logAMax))) #weight stores log(Y)
+      weight[i,]<-weight[i,]-logAMax - logSumExp(weight[i,] - logAMax) #weight stores log(Y)
 
     }
     
@@ -146,9 +146,9 @@ if(processing_docs) {
 
 
 #MAIN
-#xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
-xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
-ret <- em_multinomial(xdat, 2, itNum = 15) #30 topics
+xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
+#xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
+ret <- em_multinomial(xdat, numTopics, itNum = 15) #30 topics
 
 #print(ret) #for debugging
 # Note that every col corresponds to word id in goodCols
