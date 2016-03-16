@@ -1,5 +1,3 @@
-library('matrixStats')
-
 setwd('/Users/harry/projects/aml/assignment5/')
 vocab<-read.table('vocab.nips.txt') #vocab.[asdf].txt
 docword<-read.table('docword.nips.txt', skip=3) #docword.[asdf].txt
@@ -41,18 +39,41 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
   }
   
   #wordProb has the prob of each word for each cluster (random dp)
-
+  
   for(it in 1:itNum){
+    
     # calculate weights
     for (i in 1:n){ # for each dp
+      
       numArr<-array(0,0,0) #stores log(A_j) for all clusters 1 to j
+      
       for (j in 1:N){ #for each cluster
+        x = xdat[i, ] # get the dp (the row)
+        
+        #numerator <- clusterProb[j] # get the prior for cluster j
+        #for (k in 1:d){
+        #  numerator <- numerator * (wordProb[j, k] ^ x[k])
+        #  #numerator <- numerator * (wordProb[j, k] ^ xdat[i,k])
+        #}
         numerator<-sum(log(wordProb[j,])*xdat[i,]) + log(clusterProb[j]) #log(A_j) for cluster j
         numArr<-cbind(numArr,numerator)
+        
+        #weight[i, j] = numerator / denomSum #Y
+        #weight[i,j] <- log(weight[i,j]) #log(Y)
         weight[i,j]<- numerator #log(A_j)
+        #note that M step operates on exp(log(Y))
+        
+        # weight[i,j] stores p(delta_i,j | theta^(n),x ) - see top of page 138 of march 3 notes
       }
+      
       logAMax<-max(numArr)
+      
+      #subtract the log of the denominator
+      #for(j in 1:N) {
+      #weight[i,j]<-weight[i,j] - denomSum
+      #}
       weight[i,]<-weight[i,]-logAMax - logSumExp(weight[i,] - logAMax) #weight stores log(Y)
+      
     }
     
     #M step
@@ -61,7 +82,6 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
       weightSum <- 0
       weightSumNorm <- 0
       for (i in 1:n){
-        #exp(weight[i,j]) == exp(log(Y)) == Y == p(delta_i,j==1 | theta^(n),x)
         productSum <- productSum + xdat[i, ]*exp(weight[i,j])
         weightSumNorm <- weightSumNorm + sum(xdat[i,]) *exp( weight[i,j])
         weightSum <- weightSum + exp(weight[i,j])
@@ -81,7 +101,7 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
   return(list(wordProb=wordProb, clusterProb=clusterProb))
 }
 
-processing_docs<-TRUE
+processing_docs<-FALSE
 
 if(processing_docs) {
   #For Nips
@@ -153,11 +173,12 @@ for(topic in 1:numTopics) {
   listOfWords[topic,]<-listOfWordsRow
 }
 
+#
 #listWords[i,j] contains j'th most common word in i'th cluster
-
-#plot(1:numTopics, ret$clusterProb, type="h")
-toPlot<-table(1:numTopics,ret$clusterProb)
+#NOTE: CLUSTERS ARE IN NO PARTICULAR ORDER
+png(filename="Probability of Topics.png", width=1920, height=1080)
 barplot(ret$clusterProb, main="Probability of Topics", 
         xlab="Topic", names.arg=c(1:numTopics))
+dev.off()
 
-write.csv(listOfWords,file="Most_Common_Words_Per_Cluster.csv")
+write.csv(listOfWords,file="Most Common Words Per Cluster.csv")
