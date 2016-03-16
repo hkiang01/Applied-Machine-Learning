@@ -160,13 +160,13 @@ ret <- em_multinomial(xdat, numTopics, itNum = 15) #30 topics
 
 #translation from cols to goodCols to words
 tvocab<-t(vocab)
-listOfWords<-array("",c(nrow(ret$wordProb),topWordsPerTopic))
-for(topic in 1:nrow(ret$wordProb)) {
+listOfWords<-array("",c(numTopics,topWordsPerTopic))
+for(topic in 1:numTopics) {
   topGoodCols<-order(ret$wordProb[topic,], decreasing = T)[1:topWordsPerTopic] #top 10 indices
   listOfWordsRow<-array("",0)
   for(tgc in 1:topGoodCols) {
     index<-goodCols[topGoodCols[tgc]] #goodCols lookup table (translation)
-    listOfWordsRow[tgc]<-tvocab[index]
+    listOfWordsRow[tgc]<-tvocab[index]lolum
   }
   listOfWordsRow<-na.omit(listOfWordsRow)
   #print(listOfWordsRow)
@@ -175,3 +175,7 @@ for(topic in 1:nrow(ret$wordProb)) {
 
 #listWords[i,j] contains j'th most common word in i'th cluster
 
+#plot(1:numTopics, ret$clusterProb, type="h")
+toPlot<-table(1:numTopics,ret$clusterProb)
+barplot(ret$clusterProb, main="Probability of Topics", 
+        xlab="Topic")
