@@ -1,6 +1,8 @@
 setwd('/Users/harry/projects/aml/assignment5/')
 vocab<-read.table('vocab.nips.txt') #vocab.[asdf].txt
 docword<-read.table('docword.nips.txt', skip=3) #docword.[asdf].txt
+wordProbConstant<-0.000001
+
 
 #em_multinomial 
 # Parameters:
@@ -28,6 +30,13 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
     wordProb[i, ] <- xdat[r,] / sumWords #prob for each word for each cluster
   }
   
+  #normalize wordProb by adding a small constant
+  wordProb <- wordProb + wordProbConstant
+  for (i in 1:N){
+    normalizeRow = sum(wordProb[i, ])
+    wordProb[i, ] = wordProb[i, ] / normalizeRow
+  }
+  
   #wordProb has the prob of each word for each cluster (random dp)
 
   for(it in 1:itNum){
@@ -47,11 +56,10 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
         #}
         numerator<-sum(log(wordProb[j,])*xdat[i,]) + log(clusterProb[j]) #log(A_j) for cluster j
         numArr<-cbind(numArr,numerator)
-        numerator<-exp(numerator) #A_j
-        
+
         #weight[i, j] = numerator / denomSum #Y
         #weight[i,j] <- log(weight[i,j]) #log(Y)
-        weight[i,j]<- log(numerator) #- log(denomSum) #log(A_j) - ##log(sum(e^(log(A_l))))
+        weight[i,j]<- numerator #log(A_j)
         #note that M step operates on exp(log(Y))
         
         # weight[i,j] stores p(delta_i,j | theta^(n),x ) - see top of page 138 of march 3 notes
@@ -83,7 +91,7 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
       #for(j in 1:N) {
         #weight[i,j]<-weight[i,j] - denomSum
       #}
-      weight[i,]<-weight[i,]-denomSum
+      weight[i,]<-weight[i,]-denomSum #weight stores log(Y)
 
     }
     
@@ -99,6 +107,13 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
       }
       wordProb[j, ] = productSum / weightSumNorm;
       clusterProb[j] = weightSum/n;
+    }
+    
+    #add small constant to wordProb and re-normalize
+    wordProb <- wordProb + wordProbConstant
+    for (i in 1:N){
+      normalizeRow = sum(wordProb[i, ])
+      wordProb[i, ] = wordProb[i, ] / normalizeRow
     }
   }
   
@@ -149,9 +164,10 @@ if(processing_docs) {
   }
 }
 
+
 #MAIN
-#xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
-xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
+xdat<-dataFormatted[,c(goodCols)] #to be processed by EM algo
+#xdat <- matrix(c(100, 87,5,3,4,5,8,45,40,39),5,2) #for debugging
 ret <- em_multinomial(xdat, 2, itNum = 15) #30 topics
 
 #print(ret) #for debugging
