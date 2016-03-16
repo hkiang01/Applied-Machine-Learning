@@ -1,10 +1,9 @@
 library(jpeg)
 library(ForeCA)
-img = readJPEG("test_images/balloons.jpg", native = FALSE)
-writeJPEG(img, target = "a.jpg", quality = 1, bg = "white")
+img = readJPEG("test_images/mountains.jpg", native = FALSE)
 
 itNum <- 30
-N <- 50  #number of clusters
+N <- 10  #number of clusters
 
 red <- img[,,1]
 green <- img[,,2]
@@ -96,16 +95,23 @@ for (j in 1:N){
 weight <- weight/denomSum
 clusters <- apply(weight, 1, which.max)
 
-output = xdatRaw
+output <- xdatRaw * 0
+color <- matrix(0, N, 3);
 for (i in 1:N){
   x = xdatRaw[clusters == i,]
   newMean <- apply(x, 2, mean)
+  color[i, ] = newMean
   output[clusters == i, 1] = newMean[1]
   output[clusters == i, 2] = newMean[2]
   output[clusters == i, 3] = newMean[3]
 }
 
-
 dim(output) <- c(imgH, imgW, 3)
 
 writeJPEG(output, target = "a.jpg", quality = 1, bg = "white")
+writeJPEG(color, target = "palette.jpg", quality = 1, bg = "white")
+
+colorCount = rep(0, N)
+for (i in 1:N){
+  colorCount [i] = print(sum(clusters == i))
+}
