@@ -1,0 +1,7 @@
+for the hw submission you need inside HW5.zip
+
+a report with your results from part 1
+the folder image_results
+PolarLightsAnalysis.pdf
+
+plus all the other usual shit 
