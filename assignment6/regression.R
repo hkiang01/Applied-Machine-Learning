@@ -31,16 +31,29 @@ y_lat_obj<-as.matrix(y_lat)
 foo_lat<-data.frame(ind=xdat_obj[,c(1:ncol(xdat_obj))], dep=y_lat_obj[,c(1)])
 foo_lat.lm<-lm(dep~xdat_obj,data=foo_lat) #the dimensions of y and model in forumla=y~model must be equal
 
-for (feature in 1:ncol(xdat_obj))
-{
-  if(is.na(foo_lat.lm$coefficients[feature+1])==FALSE) #ignore features that are dependent on other features
-    # http://stats.stackexchange.com/questions/25804/why-would-r-return-na-as-a-lm-coefficient
-  {
-    plot(x=foo_lat.lm$model$xdat_obj[,c(feature)],y=foo_lat.lm$fitted.values, main=paste("Latitute vs Feature ",feature),
-       xlab=paste("Feature ",feature), ylab="Latitude")
-    abline(a=foo_lat.lm$coefficients[1], b=foo_lat.lm$coefficients[feature+1])
-  }
-}
+predicted_lat<-foo_lat.lm$fitted.values
+observed_lat<-y_lat_obj
+residuals_lat<-foo_lat.lm$residuals
+
+#predicted vs. observed
+plot(x=observed_lat, y=predicted_lat, type="p",
+     main="Predicted vs. Observed Latitude",
+     xlab="Observed Latitude", ylab="Predicted Latitude")
+#residuals vs predicted
+plot(x=predicted_lat, y=residuals_lat, type="p", 
+     main="Residual vs. Predicted Latitude",
+     xlab="Predicted Latitude", ylab="Residual")
+
+# for (feature in 1:ncol(xdat_obj))
+# {
+#   if(is.na(foo_lat.lm$coefficients[feature+1])==FALSE) #ignore features that are dependent on other features
+#     # http://stats.stackexchange.com/questions/25804/why-would-r-return-na-as-a-lm-coefficient
+#   {
+#     plot(x=foo_lat.lm$model$xdat_obj[,c(feature)],y=foo_lat.lm$fitted.values, main=paste("Latitute vs Feature ",feature),
+#        xlab=paste("Feature ",feature), ylab="Latitude")
+#     abline(a=foo_lat.lm$coefficients[1], b=foo_lat.lm$coefficients[feature+1])
+#   }
+# }
 
 lat_r_squared_val<-summary(foo_lat.lm)$r.squared
 lat_r_squared_val_adj<-summary(foo_lat.lm)$adj.r.squared
@@ -56,16 +69,29 @@ y_long_obj<-as.matrix(y_long)
 foo_long<-data.frame(ind=xdat_obj[,c(1:ncol(xdat_obj))], dep=y_long_obj[,c(1)])
 foo_long.lm<-lm(dep~xdat_obj,data=foo_long) #the dimensions of y and model in forumla=y~model must be equal
 
-for (feature in 1:ncol(xdat_obj))
-{
-  if(is.na(foo_long.lm$coefficients[feature+1])==FALSE) #ignore features that are dependent on other features
-    # http://stats.stackexchange.com/questions/25804/why-would-r-return-na-as-a-lm-coefficient
-    {
-      plot(x=foo_long.lm$model$xdat_obj[,c(feature)],y=foo_long.lm$fitted.values, main=paste("Longitude vs Feature ",feature),
-       xlab=paste("Feature ",feature), ylab="Longitude")
-      abline(a=foo_long.lm$coefficients[1], b=foo_long.lm$coefficients[feature+1])
-    }
-}
+predicted_long<-foo_long.lm$fitted.values
+observed_long<-y_long_obj
+residuals_long<-foo_long.lm$residuals
+
+#predicted vs. observed
+plot(x=observed_long, y=predicted_long, type="p",
+     main="Predicted vs. Observed Longitude",
+     xlab="Observed Longitude", ylab="Predicted Longitude")
+#residuals vs predicted
+plot(x=predicted_long, y=residuals_long, type="p",
+     main="Residual vs. Predicted Longitude",
+     xlab="Predicted Longitude", ylab="Residual")
+
+# for (feature in 1:ncol(xdat_obj))
+# {
+#   if(is.na(foo_long.lm$coefficients[feature+1])==FALSE) #ignore features that are dependent on other features
+#     # http://stats.stackexchange.com/questions/25804/why-would-r-return-na-as-a-lm-coefficient
+#     {
+#       plot(x=foo_long.lm$model$xdat_obj[,c(feature)],y=foo_long.lm$fitted.values, main=paste("Longitude vs Feature ",feature),
+#        xlab=paste("Feature ",feature), ylab="Longitude")
+#       abline(a=foo_long.lm$coefficients[1], b=foo_long.lm$coefficients[feature+1])
+#     }
+# }
 
 long_r_sqared_val<-summary(foo_long.lm)$r.squared
 long_r_squared_val_adj<-summary(foo_long.lm)$adj.r.squared
