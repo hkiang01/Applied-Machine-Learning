@@ -7,7 +7,7 @@ library('stats') #lm
 #last 2 cols are lat and long
 
 setwd('/Users/harry/projects/aml/assignment6/')
-rawdat<-read.csv('default_features_1059_tracks.txt', header=FALSE)
+rawdat<-read.csv('default_plus_chromatic_features_1059_tracks.txt', header=FALSE)
 xdat<-rawdat[,-c(ncol(rawdat),ncol(rawdat)-1)]
 ydat<-rawdat[,c(ncol(rawdat)-1,ncol(rawdat))]
 y_lat<-ydat[,c(1)]
@@ -33,9 +33,13 @@ foo_lat.lm<-lm(dep~xdat_obj,data=foo_lat) #the dimensions of y and model in foru
 
 for (feature in 1:ncol(xdat_obj))
 {
-  plot(x=foo_lat.lm$model$xdat_obj[,c(feature)],y=foo_lat.lm$fitted.values, main=paste("Latitute vs Feature ",feature),
+  if(is.na(foo_lat.lm$coefficients[feature+1])==FALSE) #ignore features that are dependent on other features
+    # http://stats.stackexchange.com/questions/25804/why-would-r-return-na-as-a-lm-coefficient
+  {
+    plot(x=foo_lat.lm$model$xdat_obj[,c(feature)],y=foo_lat.lm$fitted.values, main=paste("Latitute vs Feature ",feature),
        xlab=paste("Feature ",feature), ylab="Latitude")
-  abline(a=foo_lat.lm$coefficients[1], b=foo_lat.lm$coefficients[feature+1])
+    abline(a=foo_lat.lm$coefficients[1], b=foo_lat.lm$coefficients[feature+1])
+  }
 }
 
 lat_r_squared_val<-summary(foo_lat.lm)$r.squared
@@ -54,9 +58,13 @@ foo_long.lm<-lm(dep~xdat_obj,data=foo_long) #the dimensions of y and model in fo
 
 for (feature in 1:ncol(xdat_obj))
 {
-  plot(x=foo_long.lm$model$xdat_obj[,c(feature)],y=foo_long.lm$fitted.values, main=paste("Longitude vs Feature ",feature),
+  if(is.na(foo_long.lm$coefficients[feature+1])==FALSE) #ignore features that are dependent on other features
+    # http://stats.stackexchange.com/questions/25804/why-would-r-return-na-as-a-lm-coefficient
+    {
+      plot(x=foo_long.lm$model$xdat_obj[,c(feature)],y=foo_long.lm$fitted.values, main=paste("Longitude vs Feature ",feature),
        xlab=paste("Feature ",feature), ylab="Longitude")
-  abline(a=foo_long.lm$coefficients[1], b=foo_long.lm$coefficients[feature+1])
+      abline(a=foo_long.lm$coefficients[1], b=foo_long.lm$coefficients[feature+1])
+    }
 }
 
 long_r_sqared_val<-summary(foo_long.lm)$r.squared
