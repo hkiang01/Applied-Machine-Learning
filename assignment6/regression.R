@@ -23,31 +23,41 @@ y_long<-ydat[,c(2)]
 
 #LATITUDE
 
-# #split into training and test
-# tr_indices<-createDataPartition(y=y_lat, p=.8, list=FALSE)
-# #80% training
-# x_train<-xdat[tr_indices,]
-# y_lat_train<-y_lat[tr_indices]
-# #20% test
-# x_test<-xdat[-tr_indices,]
-# y_lat_test<-y_lat[-tr_indices]
-
 #we're allowed to use lm and glmnet
 # https://piazza.com/class/ijn48296bq5tc?cid=477
 # lm doc: https://stat.ethz.ch/R-manual/R-devel/library/stats/html/lm.html
 xdat_obj<-as.matrix(xdat)
 y_lat_obj<-as.matrix(y_lat)
-foo<-data.frame(ind=xdat_obj[,c(1:ncol(xdat_obj))], dep=y_lat_obj[,c(1)])
-#foo.ind<-xdat_obj
-#foo.dep<-y_lat_obj
-foo.lm<-lm(dep~xdat_obj,data=foo) #the dimensions of y and model in forumla=y~model must be equal
+foo_lat<-data.frame(ind=xdat_obj[,c(1:ncol(xdat_obj))], dep=y_lat_obj[,c(1)])
+foo_lat.lm<-lm(dep~xdat_obj,data=foo_lat) #the dimensions of y and model in forumla=y~model must be equal
 
 for (feature in 1:ncol(xdat_obj))
 {
-  plot(x=foo.lm$model$xdat_obj[,c(feature)],y=foo.lm$fitted.values, main=paste("Latitute vs Feature ",feature),
+  plot(x=foo_lat.lm$model$xdat_obj[,c(feature)],y=foo_lat.lm$fitted.values, main=paste("Latitute vs Feature ",feature),
        xlab=paste("Feature ",feature), ylab="Latitude")
-  abline(a=foo.lm$coefficients[1], b=foo.lm$coefficients[feature+1])
+  abline(a=foo_lat.lm$coefficients[1], b=foo_lat.lm$coefficients[feature+1])
 }
 
-r_squared_val<-summary(foo.lm)$r.squared
-r_squared_val_adj<-summary(foo.lm)$adj.r.squared
+lat_r_squared_val<-summary(foo_lat.lm)$r.squared
+lat_r_squared_val_adj<-summary(foo_lat.lm)$adj.r.squared
+
+
+#LONGITUDE
+
+#we're allowed to use lm and glmnet
+# https://piazza.com/class/ijn48296bq5tc?cid=477
+# lm doc: https://stat.ethz.ch/R-manual/R-devel/library/stats/html/lm.html
+xdat_obj<-as.matrix(xdat)
+y_long_obj<-as.matrix(y_long)
+foo_long<-data.frame(ind=xdat_obj[,c(1:ncol(xdat_obj))], dep=y_long_obj[,c(1)])
+foo_long.lm<-lm(dep~xdat_obj,data=foo_long) #the dimensions of y and model in forumla=y~model must be equal
+
+for (feature in 1:ncol(xdat_obj))
+{
+  plot(x=foo_long.lm$model$xdat_obj[,c(feature)],y=foo_long.lm$fitted.values, main=paste("Longitude vs Feature ",feature),
+       xlab=paste("Feature ",feature), ylab="Longitude")
+  abline(a=foo_long.lm$coefficients[1], b=foo_long.lm$coefficients[feature+1])
+}
+
+long_r_sqared_val<-summary(foo_long.lm)$r.squared
+long_r_squared_val_adj<-summary(foo_long.lm)$adj.r.squared
