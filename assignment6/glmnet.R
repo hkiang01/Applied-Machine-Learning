@@ -27,22 +27,26 @@ y_long_obj<-as.matrix(y_long)
 
 #latitude
 l2_dmodel_lat<-cv.glmnet(xdat_obj, y_lat_obj, alpha=0)
+plot(l2_dmodel_lat)
 l2_min_lambda_lat<-l2_dmodel_lat$lambda.min
 l2_lat_cross_val_err<-l2_dmodel_lat$cvm
 
 #longitude
 l2_dmodel_long<-cv.glmnet(xdat_obj, y_long_obj, alpha=0)
+plot(l2_dmodel_long)
 l2_min_lambda_long<-l2_dmodel_long$lambda.min
 l2_long_cross_val_err<-l2_dmodel_long$cvm
 
 # L1
 #latitude
 l1_dmodel_lat<-cv.glmnet(xdat_obj, y_lat_obj, alpha=1)
+plot(l1_dmodel_lat)
 l1_min_lambda_lat<-l1_dmodel_lat$lambda.min
 l1_lat_cross_val_err<-l1_dmodel_lat$cvm
 
 #longitude
 l1_dmodel_long<-cv.glmnet(xdat_obj, y_long_obj, alpha=1)
+plot(l1_dmodel_long)
 l1_min_lambda_long<-l1_dmodel_long$lambda.min
 l1_long_cross_val_err<-l1_dmodel_long$cvm
 
