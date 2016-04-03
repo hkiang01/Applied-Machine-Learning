@@ -62,3 +62,17 @@ yhatols_long = cbind(rep(1, n - length(train)), as.matrix(xdat_test)) %*% betaha
 yhatlasso_long = predict(lasso_long, as.matrix(xdat_test), s = bestlambdalasso_long)
 yhatridge_long = predict(ridge_long, as.matrix(xdat_test), s = bestlambdaridge_long)
 yhatelastic_long = predict(elasticnet_long, as.matrix(xdat_test), s = bestlambdanet_long)
+
+# Compare MSE on test data
+
+#latitude
+ols_mse_lat = sum((y_lat_test - yhatols_lat)^2) / nrow(xdat_test)
+lasso_mse_lat = sum((y_lat_test - yhatlasso_lat)^2) / nrow(xdat_test)
+ridge_mse_lat = sum((y_lat_test - yhatridge_lat)^2) / nrow(xdat_test)
+elastic_mse_lat = sum((y_lat_test - yhatelastic_lat)^2) / nrow(xdat_test)
+
+#longitude
+ols_mse_long = sum((y_long_test - yhatols_long)^2) / nrow(xdat_test)
+lasso_mse_long = sum((y_long_test - yhatlasso_long)^2) / nrow(xdat_test)
+ridge_mse_long = sum((y_long_test - yhatridge_long)^2) / nrow(xdat_test)
+elastic_mse_long = sum((y_long_test - yhatelastic_long)^2) / nrow(xdat_test)
