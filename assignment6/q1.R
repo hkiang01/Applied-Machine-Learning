@@ -51,6 +51,7 @@ bestlambdanet_long = elasticnet_long$lambda.min
 
 #latitude
 betahatols_lat = coef(ols_lat)
+betahatols_lat[is.na(betahatols_lat)]<-0
 yhatols_lat = cbind(rep(1, n - length(train)), as.matrix(xdat_test)) %*% betahatols_lat;
 yhatlasso_lat = predict(lasso_lat, as.matrix(xdat_test), s = bestlambdalasso_lat)
 yhatridge_lat = predict(ridge_lat, as.matrix(xdat_test), s = bestlambdaridge_lat)
@@ -58,6 +59,7 @@ yhatelastic_lat = predict(elasticnet_lat, as.matrix(xdat_test), s = bestlambdane
 
 #longitude
 betahatols_long = coef(ols_long)
+betahatols_long[is.na(betahatols_long)]<-0
 yhatols_long = cbind(rep(1, n - length(train)), as.matrix(xdat_test)) %*% betahatols_long;
 yhatlasso_long = predict(lasso_long, as.matrix(xdat_test), s = bestlambdalasso_long)
 yhatridge_long = predict(ridge_long, as.matrix(xdat_test), s = bestlambdaridge_long)
