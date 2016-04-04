@@ -94,4 +94,3 @@ plot(x=predicted_long, y=residuals_long, type="p",
 # }
 
 long_r_sqared_val<-summary(foo_long.lm)$r.squared
-long_r_squared_val_adj<-summary(foo_long.lm)$adj.r.squared
