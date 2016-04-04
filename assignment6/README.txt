@@ -5,6 +5,19 @@ Open RStudio.
 setwd('/directory/of/project')
 source('project_file.R')
 
+libraries:
+stats
+caret
+stats
+MASS
+glmnet
+pls
+boot
+
+source files:
+q1.R (all of Q1 except box cod)
+regression.R (Q1 box cox)
+regressionLogistic.R (Q2)
 
 For all you cat lovers out there:
 
