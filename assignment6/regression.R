@@ -108,8 +108,6 @@ long_r_squared_val_adj<-summary(foo_long.lm)$adj.r.squared
 # First I did Box-Cox on Y_origin, to get a Y_boxed. 
 y_lat_offset <- y_lat_obj + 90
 y_long_offset <- y_long_obj + 90
-# predicted_lat_offset <- predicted_lat + predicted_lat_min+1e-5
-# predicted_long_offset <- predicted_long + predicted_long_min+1e-5
 
 # y vs xdat
 bc_lat<-boxcox(y_lat_offset~as.matrix(xdat), lambda = seq(-5, 5, 1/10))
@@ -120,23 +118,21 @@ lambda_lat<-bc_lat$x[which.max(bc_lat$y)]
 lambda_long<-bc_long$x[which.max(bc_long$y)]
 
 y_lat_boxed<-(y_lat_offset^lambda_lat - 1)/lambda_lat
-#y_lat_boxed[is.na(y_lat_boxed)]<-0
 y_long_boxed<-(y_long_offset^lambda_long - 1)/lambda_long
 
-# Then I did linear regression with X and Y_boxed.
-# linear regression
+# linear regression, x and boxed
 reg_bc_lat<-data.frame(ind=xdat, dep=y_lat_boxed)
 reg_bc_lat.lm<-lm(y_lat_boxed~as.matrix(xdat))
 reg_bc_long<-data.frame(ind=xdat, dep=y_long_boxed)
 reg_bc_long.lm<-lm(y_long_boxed~as.matrix(xdat))
-# 
+
 # Then I use the model to predict X into Y_predict. 
 predict_bc_lat<-predict(reg_bc_lat.lm,data.frame(xdat))
 predict_bc_long<-predict(reg_bc_long.lm,data.frame(xdat))
 
-# And finally I implemented an un-Box-Cox transformation, to transform Y_predict to Y_unboxed.
+# reverse Box-Cox tranformation from predicted to unboxed.
 un_bc_lat<-(predict_bc_lat*lambda_lat+1)^(1/lambda_lat)-90
 un_bc_long<-(predict_bc_long*lambda_long+1)^(1/lambda_long)-90
-# And calculate R2 using var(Y_unboxed)/var(Y_origin).
+# R2 = var(unboxed)/var(origin).
 bc_lat_r2 <- var(un_bc_lat)/var(y_lat_obj)
 bc_long_r2 <- var(un_bc_long)/var(y_long_obj)
