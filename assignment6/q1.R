@@ -39,6 +39,14 @@ lasso_mse_arr_long = c()
 ridge_mse_arr_long = c()
 net_mse_arr_long = c()
 
+bestlambdalasso_arr_lat = c()
+bestlambdaridge_arr_lat = c()
+bestlambdanet_arr_lat = c()
+
+bestlambdalasso_arr_long = c()
+bestlambdaridge_arr_long = c()
+bestlambdanet_arr_long = c()
+
 for(i in 1:length(lasso_alphas)) {
   #latitude
   ols_lat = lm(y_lat_tr ~ as.matrix(xdat_tr))
@@ -50,6 +58,10 @@ for(i in 1:length(lasso_alphas)) {
   bestlambdaridge_lat = ridge_lat$lambda.min
   bestlambdanet_lat = elasticnet_lat$lambda.min
   
+  bestlambdalasso_arr_lat = c(bestlambdalasso_arr_lat, bestlambdalasso_lat)
+  bestlambdaridge_arr_lat = c(bestlambdaridge_arr_lat, bestlambdaridge_lat)
+  bestlambdanet_arr_lat = c(bestlambdanet_arr_lat, bestlambdanet_lat)
+  
   #longitude
   ols_long = lm(y_long_tr ~ as.matrix(xdat_tr))
   lasso_long = cv.glmnet(as.matrix(xdat_tr), y_long_tr, alpha = lasso_alphas[i])
@@ -59,6 +71,10 @@ for(i in 1:length(lasso_alphas)) {
   bestlambdalasso_long = lasso_long$lambda.min
   bestlambdaridge_long = ridge_long$lambda.min
   bestlambdanet_long = elasticnet_long$lambda.min
+  
+  bestlambdalasso_arr_long = c(bestlambdalasso_arr_long, bestlambdalasso_long)
+  bestlambdaridge_arr_long = c(bestlambdaridge_arr_long, bestlambdaridge_long)
+  bestlambdanet_arr_long = c(bestlambdanet_arr_long, bestlambdanet_long)
   
   # Test regression models after finding best regularization constant for each
   
@@ -100,5 +116,26 @@ for(i in 1:length(lasso_alphas)) {
   lasso_mse_arr_long = c(lasso_mse_arr_long, lasso_mse_long)
   ridge_mse_arr_long = c(ridge_mse_arr_long, ridge_mse_long)
   net_mse_arr_long = c(net_mse_arr_long, elastic_mse_long)
+  
+  # Generate plots for each regularization scheme (lasso, ridge, elastic net)
+  
+  #latitude
+  plot(lasso_lat)
+  title(paste("Lasso Regression (latitude) alpha =",lasso_alphas[i]), line=3)
+  plot(ridge_lat)
+  title(paste("Ridge Regression (latitude) alpha =",ridge_alphas[i]), line=3)
+  plot(elasticnet_lat)
+  title(paste("Elastic Net Regression (latitude) alpha =",net_alphas[i]), line=3)
+  
+  
+  #longitude
+  plot(lasso_long)
+  title(paste("Lasso Regression (longitude) alpha =",lasso_alphas[i]), line=3)
+  plot(ridge_long)
+  title(paste("Ridge Regression (longitude) alpha =",ridge_alphas[i]), line=3)
+  plot(elasticnet_long)
+  title(paste("Elastic Net Regression (longitude) alpha =",net_alphas[i]), line=3)
+  
+  
 }
 
