@@ -125,7 +125,7 @@ for(i in 1:length(lasso_alphas)) {
   plot(ridge_lat)
   title(paste("Ridge Regression (latitude) alpha =",ridge_alphas[i]), line=3)
   plot(elasticnet_lat)
-  title(paste("Elastic Net Regression (latitude) alpha =",ridge_alphas[i]), line=3)
+  title(paste("Elastic Net Regression (latitude) alpha =",net_alphas[i]), line=3)
   
   
   #longitude
@@ -134,7 +134,7 @@ for(i in 1:length(lasso_alphas)) {
   plot(ridge_long)
   title(paste("Ridge Regression (longitude) alpha =",ridge_alphas[i]), line=3)
   plot(elasticnet_long)
-  title(paste("Elastic Net Regression (longitude) alpha =",ridge_alphas[i]), line=3)
+  title(paste("Elastic Net Regression (longitude) alpha =",net_alphas[i]), line=3)
   
   
 }
