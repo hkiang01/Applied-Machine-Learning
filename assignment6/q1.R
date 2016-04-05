@@ -116,5 +116,26 @@ for(i in 1:length(lasso_alphas)) {
   lasso_mse_arr_long = c(lasso_mse_arr_long, lasso_mse_long)
   ridge_mse_arr_long = c(ridge_mse_arr_long, ridge_mse_long)
   net_mse_arr_long = c(net_mse_arr_long, elastic_mse_long)
+  
+  # Generate plots for each regularization scheme (lasso, ridge, elastic net)
+  
+  #latitude
+  plot(lasso_lat)
+  title(paste("Lasso Regression (latitude) alpha =",lasso_alphas[i]), line=3)
+  plot(ridge_lat)
+  title(paste("Ridge Regression (latitude) alpha =",ridge_alphas[i]), line=3)
+  plot(elasticnet_lat)
+  title(paste("Elastic Net Regression (latitude) alpha =",ridge_alphas[i]), line=3)
+  
+  
+  #longitude
+  plot(lasso_long)
+  title(paste("Lasso Regression (longitude) alpha =",lasso_alphas[i]), line=3)
+  plot(ridge_long)
+  title(paste("Ridge Regression (longitude) alpha =",ridge_alphas[i]), line=3)
+  plot(elasticnet_long)
+  title(paste("Elastic Net Regression (longitude) alpha =",ridge_alphas[i]), line=3)
+  
+  
 }
 
