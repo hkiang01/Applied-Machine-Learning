@@ -1,5 +1,6 @@
 library(glmnet)
 library(caret)
+setwd('/Users/harry/projects/aml/assignment7/')
 
 srange = c(100000000, 50000000000, 70000000000, 80000000000, 100000000000, 200000000000000)
 
