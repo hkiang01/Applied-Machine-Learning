@@ -1,7 +1,7 @@
 library(glmnet)
 library(caret)
 
-srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
+srange = c(100000000, 50000000000, 70000000000, 80000000000, 100000000000, 200000000000000)
 
 locDataRaw = read.table('Locations.txt', header = TRUE)
 tempDataRaw = read.table('Oregon_Met_Data.txt', header = TRUE)
@@ -45,14 +45,14 @@ for (rangeIt in 1:length(srange)){
     msp <- as.matrix(spaces)
     msp <- msp[,train]
     
-    wmat = exp(-mspTrain^2/(2*srange[rangeIt]^2))
+    wmat = exp(-mspTrain^2/(2*srange[rangeIt]))
     
     frameData = data.frame(temp = metDataTrain[,1], x = wmat)
     metSmoothCVlm <- lm(temp ~ ., data = frameData)
     
     
-    wmat <- exp(-msp^2/(2*srange[rangeIt]^2))
-    frameData = data.frame(temp = metData[,1], x = wmat)
+    wmat <- exp(-msp^2/(2*srange[rangeIt]))
+    frameData = data.frame(x = wmat)
     predTempCV <- predict(metSmoothCVlm, newdata = frameData)
     
     # betahatols = coef(metSmoothCVlm)
@@ -73,40 +73,42 @@ for (rangeIt in 1:length(srange)){
 print(mseTrain)
 print(mseTest)
 
-# minEast = min(locData['East_UTM'])
-# maxEast = max(locData['East_UTM'])
-# minNorth = min(locData['North_UTM'])
-# maxNorth = max(locData['North_UTM'])
-# eastSeq = seq(minEast ,  maxEast ,length=100)
-# northSeq = seq(minNorth, maxNorth, length = 100)
-# points <- matrix(0, 100*100, 2)
-# for (i in 1:100){
-#   for (j in 1:100){
-#     points[i*100 + j, ] = c(eastSeq[i], northSeq[j])
-#   }
-# }
-# 
-# bp = 1:531
-# bpVector = rep(TRUE, 531)
-# 
-# spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
-# msp <- as.matrix(spaces)
-# 
-# wmat = exp(-msp^2/(2*srange[4]^2))
-# 
-# frameData = data.frame(temp = metData[,1], x = wmat)
-# model <- lm(temp ~ ., data = frameData)
-# 
-# 
-# east = matrix(points[,1], nrow(points), length(bp))
-# north = matrix(points[,2], nrow(points), length(bp))
-# 
-# eastbp = t(matrix(metData[bpVector, 2], length(bp), nrow(points)))
-# northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
-# 
-# pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
-# 
-# wmat <- exp(-pointSpaces^2/(2*srange[4]^2))
-# frameData = data.frame(x = wmat)
-# tempPrediction <- predict(model, newdata = frameData)
-# tempMatrix = matrix(tempPrediction, 100, 100)
+minEast = min(locData['East_UTM'])
+maxEast = max(locData['East_UTM'])
+minNorth = min(locData['North_UTM'])
+maxNorth = max(locData['North_UTM'])
+eastSeq = seq(minEast ,  maxEast ,length=100)
+northSeq = seq(minNorth, maxNorth, length = 100)
+points <- matrix(0, 100*100, 2)
+for (i in 0:99){
+  for (j in 1:100){
+    points[i*100 + j, ] = c(eastSeq[i+1], northSeq[j])
+  }
+}
+
+bp = 1:531
+bpVector = rep(TRUE, 531)
+bestScale = 70000000000
+
+spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
+msp <- as.matrix(spaces)
+
+wmat = exp(-msp^2/(2*bestScale))
+
+frameData = data.frame(temp = metData[,1], x = wmat)
+model <- lm(temp ~ ., data = frameData)
+
+
+east = matrix(points[,1], nrow(points), length(bp))
+north = matrix(points[,2], nrow(points), length(bp))
+
+eastbp = t(matrix(metData[bpVector, 2], length(bp), nrow(points)))
+northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
+
+pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
+
+wmat <- exp(-pointSpaces^2/(2*bestScale))
+frameData = data.frame(x = wmat)
+tempPrediction <- predict(model, newdata = frameData)
+tempMatrix = t(matrix(tempPrediction, 100, 100))
+image(tempMatrix)
