@@ -10,8 +10,8 @@
 library('glmnet') #glmnet
 library(caret) #createDataPartition
 
-# setwd('/Users/harry/projects/aml/assignment7/')
-setwd('/Users/annlinsheih/Dev/aml/assignment7/')
+setwd('/Users/harry/projects/aml/assignment7/')
+#setwd('/Users/annlinsheih/Dev/aml/assignment7/')
 
 srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
 
@@ -29,15 +29,16 @@ tempDataUnfiltered = tempDataRaw[c('SID', 'Year', 'Tmin_deg_C')]
 # locData[,2] = (locData[,2] - meanEast)/sdEast
 # locData[,3] = (locData[,3] - meanNorth)/sdNorth
 
+#filter out bad points
 tempData = tempDataUnfiltered[tempDataUnfiltered[,3] < 9999,]
 
+#mean min temp by station ID and year
 avgTemp = aggregate(tempData, by=list(tempData$SID,tempData$Year), FUN=mean, na.rm=TRUE)
 
 #average temp by SID and year (true values)
 metDataByYear = merge(avgTemp, locData, by = 'SID')
 metDataByYear = metDataByYear[,-c(2,3)] #gets rid of Group1 and Group2 columns created by merge
-
-metData = metDataByYear[,c(3,4,5)]
+metData = metDataByYear[,c(3,4,5)] #min temp, east_utm, north_utm
 
 #average temp across all years by SID (true values)
 stationTempMeans = aggregate(metDataByYear[,c('SID', 'Tmin_deg_C')], by= list(metDataByYear$SID), FUN=mean, na.rm=TRUE)[,c(2,3)]
@@ -49,15 +50,14 @@ train = apply(metDataByYear, 1, function(x) x['SID'] %in% bp)
 metDataTrain = metData[train, ]
 metDataTest = metData[-train,]
 
-#obtain the distance matrix
+#obtain the distance matrices
 xmat = as.matrix(metDataTrain)
-test_mat = as.matrix(metDataTest)
 xspaces = dist(xmat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
-test_spaces = dist(test_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
 xmsp = as.matrix(xspaces)
-test_msp = as.matrix(test_spaces)
 
 test_mat = as.matrix(metDataTest)
+test_spaces = dist(test_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+test_msp = as.matrix(test_spaces)
 
 all_mat = as.matrix(metData)
 all_spaces = dist(all_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
@@ -66,31 +66,32 @@ all_msp = as.matrix(all_spaces)
 #generate Gramm matrix for each scale candidate
 mseTrain = rep(-1, length(srange)) #used to test scale candidates
 mseTest = rep(-1, length(srange)) #used to test scale candidates
-# for(i in 1:length(srange)) {
-#   grammMatrix = exp(-xmsp/2*srange[i]^2)
-#   xwmat = cbind(xwmat, grammMatrix)
-# }
 
+#the ground truth, used to pick from scale candidates
 train_answers = as.matrix(xmat[,c(1)])
 
 for(i in 1:length(srange)) {
-  
-#   i = 1
+
   #kernel function
   xwmat = exp(-xmsp^2/(2*srange[i]^2))
-  all_wmat = exp(-all_msp^2/(2*srange[i]^2))
   
   #the training
   wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = 1) #lasso
   
   #the predicting
   predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
-  
+
+  #error rate
+  all_wmat = exp(-all_msp^2/(2*srange[i]^2))
   mseTrain[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
-  
-  
 }
 
+#choose best scale corresponding to minimum error
+bestScale = srange[which.min(mseTrain)]
+
+#obtain model for all points using best scale
+wmat = exp(-all_msp^2/(2*bestScale^2))
+wmod_best = cv.glmnet(wmat, all_mat[,1], alpha = 1)
 
 #image bounds
 xmin = min(locData[,c(2)])
@@ -109,23 +110,10 @@ for (i in 0:99){
   }
 }
 
-bp = 1:nrow(all_mat)
-bpVector = rep(TRUE, nrow(all_mat))
-bestScale = srange[which.min(mseTrain)]
-
-spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
-msp <- as.matrix(spaces)
-
-wmat = exp(-msp^2/(2*bestScale^2))
-
-wmod_best = cv.glmnet(wmat, metData[,1], alpha = 1) #lasso
-
-east = matrix(points[,1], nrow(points), length(bp))
-north = matrix(points[,2], nrow(points), length(bp))
-
-eastbp = t(matrix(metData[bpVector, 2], length(bp), nrow(points)))
-northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
-
+east = matrix(points[,1], nrow(points), nrow(all_mat))
+north = matrix(points[,2], nrow(points), nrow(all_mat))
+eastbp = t(matrix(all_mat[,c(2)], nrow(all_mat), nrow(points)))
+northbp = t(matrix(all_mat[,c(3)], nrow(all_mat), nrow(points)))
 pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
 
 wmat <- exp(-pointSpaces^2/(2*bestScale^2))
