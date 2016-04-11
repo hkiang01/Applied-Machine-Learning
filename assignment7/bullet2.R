@@ -20,13 +20,13 @@ tempDataRaw = read.table('Oregon_Met_Data.txt', header = TRUE)
 locData = locDataRaw[c('SID', 'East_UTM', 'North_UTM')]
 tempDataUnfiltered = tempDataRaw[c('SID', 'Year', 'Tmin_deg_C')]
 
-# meanEast = mean(locData[,2])
-# sdEast = sd(locData[,2])
-# meanNorth = mean(locData[,3])
-# sdNorth = sd(locData[,3])
-# 
-# locData[,2] = (locData[,2] - meanEast)/sdEast
-# locData[,3] = (locData[,3] - meanNorth)/sdNorth
+meanEast = mean(locData[,2])
+sdEast = sd(locData[,2])
+meanNorth = mean(locData[,3])
+sdNorth = sd(locData[,3])
+
+locData[,2] = (locData[,2] - meanEast)/sdEast
+locData[,3] = (locData[,3] - meanNorth)/sdNorth
 
 tempData = tempDataUnfiltered[tempDataUnfiltered[,3] < 9999,]
 
@@ -90,26 +90,44 @@ for(i in 1:length(srange)) {
   
 }
 
-bestScale = srange[which.min(mseTrain)]
 
 #image bounds
-xmin = min(xmat[,c(2)])
-xmax = max(xmat[,c(2)])
-ymin = min(xmat[,c(3)])
-ymax = max(xmat[,c(3)])
+xmin = min(locData[,c(2)])
+xmax = max(locData[,c(2)])
+ymin = min(locData[,c(3)])
+ymax = max(locData[,c(3)])
 xvec = seq(xmin, xmax, length=100)
 yvec = seq(ymin, ymax, length=100)
 
 #plots
-# points<-matrix(0,nrow=100*100,ncol=2)
-# ptr = 1
-# for(i in 1:100)
-# {
-#   for (j in 1:100)
-#   {
-#     points[ptr,1] = xvec[i]
-#     points[ptr,2] = yvec[j]
-#     ptr = ptr+1
-#   }
-# }
+points<-matrix(0,nrow=100*100,ncol=2)
+points <- matrix(0, 100*100, 2)
+for (i in 0:99){
+  for (j in 1:100){
+    points[i*100 + j, ] = c(xvec[i+1], yvec[j])
+  }
+}
 
+bp = 1:nrow(all_mat)
+bpVector = rep(TRUE, nrow(all_mat))
+bestScale = srange[which.min(mseTrain)]
+
+spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
+msp <- as.matrix(spaces)
+
+wmat = exp(-msp^2/(2*bestScale))
+
+wmod_best = cv.glmnet(wmat, metData[,1], alpha = 1) #lasso
+
+east = matrix(points[,1], nrow(points), length(bp))
+north = matrix(points[,2], nrow(points), length(bp))
+
+eastbp = t(matrix(metData[bpVector, 2], length(bp), nrow(points)))
+northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
+
+pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
+
+wmat <- exp(-pointSpaces^2/(2*bestScale))
+tempPrediction = predict.cv.glmnet(wmod_best, wmat, s=wmod_best$lambda.min )
+tempMatrix = t(matrix(tempPrediction, 100, 100))
+image(tempMatrix)
