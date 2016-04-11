@@ -24,7 +24,7 @@ tempDataUnfiltered = tempDataRaw[c('SID', 'Year', 'Tmin_deg_C')]
 # sdEast = sd(locData[,2])
 # meanNorth = mean(locData[,3])
 # sdNorth = sd(locData[,3])
-
+# 
 # locData[,2] = (locData[,2] - meanEast)/sdEast
 # locData[,3] = (locData[,3] - meanNorth)/sdNorth
 
@@ -70,10 +70,11 @@ mseTest = rep(-1, length(srange)) #used to test scale candidates
 #   xwmat = cbind(xwmat, grammMatrix)
 # }
 
+train_answers = as.matrix(xmat[,c(1)])
 
 for(i in 1:length(srange)) {
   
-  i = 1
+#   i = 1
   #kernel function
   xwmat = exp(-xmsp/(2*srange[i]^2))
   all_wmat = exp(-all_msp/(2*srange[i]^2))
@@ -82,8 +83,15 @@ for(i in 1:length(srange)) {
   wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = 1) #lasso
   
   #the predicting
-  predTemp = predict(wmod, test_mat, s=wmod$lambda.min )
+  predTemp = predict.cv.glmnet(wmod, xwmat, s=wmod$lambda.min )
+  
+  mseTrain[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
+  
+  
 }
+
+bestScale = srange[which.min(mseTrain)]
+
 #image bounds
 xmin = min(xmat[,c(2)])
 xmax = max(xmat[,c(2)])
