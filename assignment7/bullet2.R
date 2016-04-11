@@ -10,7 +10,8 @@
 library('glmnet') #glmnet
 library(caret) #createDataPartition
 
-setwd('/Users/harry/projects/aml/assignment7/')
+# setwd('/Users/harry/projects/aml/assignment7/')
+setwd('/Users/annlinsheih/Dev/aml/assignment7/')
 
 srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
 
@@ -76,8 +77,8 @@ for(i in 1:length(srange)) {
   
 #   i = 1
   #kernel function
-  xwmat = exp(-xmsp/(2*srange[i]^2))
-  all_wmat = exp(-all_msp/(2*srange[i]^2))
+  xwmat = exp(-xmsp^2/(2*srange[i]^2))
+  all_wmat = exp(-all_msp^2/(2*srange[i]^2))
   
   #the training
   wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = 1) #lasso
@@ -115,7 +116,7 @@ bestScale = srange[which.min(mseTrain)]
 spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
 msp <- as.matrix(spaces)
 
-wmat = exp(-msp/(2*bestScale))
+wmat = exp(-msp^2/(2*bestScale^2))
 
 wmod_best = cv.glmnet(wmat, metData[,1], alpha = 1) #lasso
 
@@ -127,7 +128,7 @@ northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
 
 pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
 
-wmat <- exp(-pointSpaces/(2*bestScale))
+wmat <- exp(-pointSpaces^2/(2*bestScale^2))
 tempPrediction = predict(wmod_best, wmat, s=wmod_best$lambda.min )
 tempMatrix = t(matrix(tempPrediction, 100, 100))
 image(tempMatrix)
@@ -139,8 +140,8 @@ mseTrainElastic = rep(-1, length(net_alphas)) #used to test scale candidate
 
 #   i = 1
 #kernel function
-xwmat = exp(-xmsp/(2*bestScale^2))
-all_wmat = exp(-all_msp/(2*bestScale^2))
+xwmat = exp(-xmsp^2/(2*bestScale^2))
+all_wmat = exp(-all_msp^2/(2*bestScale^2))
 
 
 for(i in 1:length(net_alphas)) {
@@ -162,7 +163,7 @@ bestScale = bestScale #srange[which.min(mseTrain)]
 spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
 msp <- as.matrix(spaces)
 
-wmat = exp(-msp/(2*bestScale))
+wmat = exp(-msp^2/(2*bestScale^2))
 
 wmod_best = cv.glmnet(wmat, metData[,1], alpha = bestAlpha) #elastic
 
@@ -174,7 +175,7 @@ northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
 
 pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
 
-wmat <- exp(-pointSpaces/(2*bestScale))
+wmat <- exp(-pointSpaces^2/(2*bestScale^2))
 tempPrediction = predict(wmod_best, wmat, s=wmod_best$lambda.min )
 tempMatrix = t(matrix(tempPrediction, 100, 100))
 image(tempMatrix)
