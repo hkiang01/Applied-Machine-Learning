@@ -135,7 +135,7 @@ image(tempMatrix)
 #Bullet3
 net_alphas = array(c(.4,.5,.6))
 
-mseTrainElasitc = rep(-1, length(net_alphas)) #used to test scale candidate
+mseTrainElastic = rep(-1, length(net_alphas)) #used to test scale candidate
 
 #   i = 1
 #kernel function
@@ -153,16 +153,18 @@ for(i in 1:length(net_alphas)) {
   
 }
 
+bestAlpha = net_alphas[which.min(mseTrainElastic)]
+
 bp = 1:nrow(all_mat)
 bpVector = rep(TRUE, nrow(all_mat))
-bestScale = bestScale//srange[which.min(mseTrain)]
+bestScale = bestScale #srange[which.min(mseTrain)]
 
 spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
 msp <- as.matrix(spaces)
 
 wmat = exp(-msp/(2*bestScale))
 
-wmod_best = cv.glmnet(wmat, metData[,1], alpha = 1) #lasso
+wmod_best = cv.glmnet(wmat, metData[,1], alpha = bestAlpha) #elastic
 
 east = matrix(points[,1], nrow(points), length(bp))
 north = matrix(points[,2], nrow(points), length(bp))
