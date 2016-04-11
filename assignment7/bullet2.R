@@ -8,6 +8,8 @@
 #How many predictors does your model use? How does prediction error change with the number of predictors?
 
 library('glmnet') #glmnet
+library(caret) #createDataPartition
+
 setwd('/Users/harry/projects/aml/assignment7/')
 
 srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
@@ -34,6 +36,52 @@ avgTemp = aggregate(tempData, by=list(tempData$SID,tempData$Year), FUN=mean, na.
 metDataByYear = merge(avgTemp, locData, by = 'SID')
 metDataByYear = metDataByYear[,-c(2,3)] #gets rid of Group1 and Group2 columns created by merge
 
+metData = metDataByYear[,c(3,4,5)]
+
 #average temp across all years by SID (true values)
 stationTempMeans = aggregate(metDataByYear[,c('SID', 'Tmin_deg_C')], by= list(metDataByYear$SID), FUN=mean, na.rm=TRUE)[,c(2,3)]
 
+#data split
+bp = createDataPartition(stationTempMeans[,1], 1, 0.8, list = FALSE)
+bpVector = 1:length(stationTempMeans[,1]) %in% bp
+train = apply(metDataByYear, 1, function(x) x['SID'] %in% bp)
+metDataTrain = metData[train, ]
+
+#obtain the distance matrix
+xmat = as.matrix(metDataTrain)
+spaces = dist(xmat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+msp = as.matrix(spaces)
+
+#kernel function
+wmat = exp(-msp/(2*srange[i]^2))
+
+#generate Gramm matrix for each scale candidate
+mseTrain = rep(-1, length(srange)) #used to test scale candidates
+mseTest = rep(-1, length(srange)) #used to test scale candidates
+for(i in 1:length(srange)) {
+  grammMatrix = exp(-msp/2*srange[i]^2)
+  wmat = cbind(wmat, grammMatrix)
+}
+
+#the training
+wmod = cv.glmnet(wmat, metDataTrain[,1], alpha = 1) #lasso
+
+#image bounds
+xmin = min(xmat['East_UTM'])
+xmax = max(xmat['East_UTM'])
+ymin = min(xmat['North_UTM'])
+ymax = max(xmat['North_UTM'])
+xvec = seq(xmin, xmax, length=100)
+yvec = seq(ymin, ymax, length=100)
+
+#plots
+points<-matrix(0,nrow=100*100,ncol=2)
+for (i in 0:99){
+  for (j in 1:100){
+    points[i*100 + j, ] = c(xvec[i+1], yvec[j])
+  }
+}
+
+#define outer product (cross product) function argument
+diff_ij = function(i,j) sqrt(rowSums((points[i,] - xmat[j,])^2))
+distsampletOpts = outer(seq_len(10000), seq_len(dim(xmat)[1]), diff_ij)
