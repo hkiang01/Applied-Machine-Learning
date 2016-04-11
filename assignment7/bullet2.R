@@ -1,11 +1,4 @@
-#Regularize this kernel method (section 9.1.1; worked example 9.1; associated code) using the lasso,
-#and predict the average annual temperature at each point on a 100x100 grid spanning the weather stations.
-#You should choose the regularization constant using cross validation
-#(cv.glmnet will do the work for you; read the manual!).
-#You should use each data point as a base point, and you use a range of at least six scales.
-#Plot your prediction as an image.
-#Compare to the Kriging result that you can find in figure 4 here .
-#How many predictors does your model use? How does prediction error change with the number of predictors?
+#DATA AND PLOTTING OVERHEAD
 
 library('glmnet') #glmnet
 library(caret) #createDataPartition
@@ -52,16 +45,56 @@ metDataTest = metData[-train,]
 
 #obtain the distance matrices
 xmat = as.matrix(metDataTrain)
-xspaces = dist(xmat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+xspaces = dist(xmat[,c("East_UTM", "North_UTM")], method = "euclidean", diag = FALSE, upper = FALSE)
 xmsp = as.matrix(xspaces)
 
 test_mat = as.matrix(metDataTest)
-test_spaces = dist(test_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+test_spaces = dist(test_mat[,c("East_UTM", "North_UTM")], method = "euclidean", diag = FALSE, upper = FALSE)
 test_msp = as.matrix(test_spaces)
 
 all_mat = as.matrix(metData)
-all_spaces = dist(all_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+all_spaces = dist(all_mat[,c("East_UTM", "North_UTM")], method = "euclidean", diag = FALSE, upper = FALSE)
 all_msp = as.matrix(all_spaces)
+
+#kernel function for distance matrix from all points
+wmat = exp(-all_msp^2/(2*bestScale^2))
+
+#image bounds
+xmin = min(locData[,c("East_UTM")])
+xmax = max(locData[,c("East_UTM")])
+ymin = min(locData[,c("North_UTM")])
+ymax = max(locData[,c("North_UTM")])
+xvec = seq(xmin, xmax, length=100)
+yvec = seq(ymin, ymax, length=100)
+
+#plot bucketing of 100x100 region
+points<-matrix(0,nrow=100*100,ncol=2)
+points <- matrix(0, 100*100, 2)
+for (i in 0:99){
+  for (j in 1:100){
+    points[i*100 + j, ] = c(xvec[i+1], yvec[j])
+  }
+}
+
+east = matrix(points[,1], nrow(points), nrow(all_mat))
+north = matrix(points[,2], nrow(points), nrow(all_mat))
+
+#obtain the distance matrix of the base points relative to plot bucketted grid
+eastbp = t(matrix(all_mat[,c("East_UTM")], nrow(all_mat), nrow(points)))
+northbp = t(matrix(all_mat[,c("North_UTM")], nrow(all_mat), nrow(points)))
+pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
+
+#END OF DATA AND PLOTTING OVERHEAD
+
+#bullet2
+#Regularize this kernel method (section 9.1.1; worked example 9.1; associated code) using the lasso,
+#and predict the average annual temperature at each point on a 100x100 grid spanning the weather stations.
+#You should choose the regularization constant using cross validation
+#(cv.glmnet will do the work for you; read the manual!).
+#You should use each data point as a base point, and you use a range of at least six scales.
+#Plot your prediction as an image.
+#Compare to the Kriging result that you can find in figure 4 here .
+#How many predictors does your model use? How does prediction error change with the number of predictors?
 
 #generate Gramm matrix for each scale candidate
 mseTrain = rep(-1, length(srange)) #used to test scale candidates
@@ -82,89 +115,50 @@ for(i in 1:length(srange)) {
   predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
 
   #error rate
-  all_wmat = exp(-all_msp^2/(2*srange[i]^2))
   mseTrain[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
 }
 
 #choose best scale corresponding to minimum error
 bestScale = srange[which.min(mseTrain)]
 
-#obtain model for all points using best scale
-wmat = exp(-all_msp^2/(2*bestScale^2))
-wmod_best = cv.glmnet(wmat, all_mat[,1], alpha = 1)
+#obtain bset model for all points using best scale
+wmod_best_lasso = cv.glmnet(wmat, all_mat[,1], alpha = 1)
 
-#image bounds
-xmin = min(locData[,c(2)])
-xmax = max(locData[,c(2)])
-ymin = min(locData[,c(3)])
-ymax = max(locData[,c(3)])
-xvec = seq(xmin, xmax, length=100)
-yvec = seq(ymin, ymax, length=100)
+#apply above distance matrix in the prediction using best model
+tempPrediction_lasso = predict(wmod_best_lasso, wmat_pointSpaces, s=wmod_best$lambda.min )
+tempMatrix_lasso = t(matrix(tempPrediction_lasso, 100, 100))
+image(tempMatrix_lasso)
 
-#plots
-points<-matrix(0,nrow=100*100,ncol=2)
-points <- matrix(0, 100*100, 2)
-for (i in 0:99){
-  for (j in 1:100){
-    points[i*100 + j, ] = c(xvec[i+1], yvec[j])
-  }
-}
+# Bullet3
+# Now investigate the effect of different choices of
+# elastic net constant (alpha)
 
-east = matrix(points[,1], nrow(points), nrow(all_mat))
-north = matrix(points[,2], nrow(points), nrow(all_mat))
-eastbp = t(matrix(all_mat[,c(2)], nrow(all_mat), nrow(points)))
-northbp = t(matrix(all_mat[,c(3)], nrow(all_mat), nrow(points)))
-pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
-
-wmat <- exp(-pointSpaces^2/(2*bestScale^2))
-tempPrediction = predict(wmod_best, wmat, s=wmod_best$lambda.min )
-tempMatrix = t(matrix(tempPrediction, 100, 100))
-image(tempMatrix)
-
-#Bullet3
+#choice of alpha values for elastic net
 net_alphas = array(c(.4,.5,.6))
-
 mseTrainElastic = rep(-1, length(net_alphas)) #used to test scale candidate
 
-#   i = 1
-#kernel function
-xwmat = exp(-xmsp^2/(2*bestScale^2))
-all_wmat = exp(-all_msp^2/(2*bestScale^2))
-
+#use same scale as lasso for basis of comparison
+bestScale = bestScale #srange[which.min(mseTrain)]
 
 for(i in 1:length(net_alphas)) {
 
   #the training
   wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = net_alphas[i] ) #elastic net
+  
   #the predicting
   predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
   mseTrainElastic[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
   
 }
 
+#choose best alpha corresponding to minimal error
 bestAlpha = net_alphas[which.min(mseTrainElastic)]
 
-bp = 1:nrow(all_mat)
-bpVector = rep(TRUE, nrow(all_mat))
-bestScale = bestScale #srange[which.min(mseTrain)]
+#obtain bset model for all points using best scale and best alpha
+wmod_best_elastic = cv.glmnet(wmat, metData[,1], alpha = bestAlpha) #elastic
 
-spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
-msp <- as.matrix(spaces)
-
-wmat = exp(-msp^2/(2*bestScale^2))
-
-wmod_best = cv.glmnet(wmat, metData[,1], alpha = bestAlpha) #elastic
-
-east = matrix(points[,1], nrow(points), length(bp))
-north = matrix(points[,2], nrow(points), length(bp))
-
-eastbp = t(matrix(metData[bpVector, 2], length(bp), nrow(points)))
-northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
-
-pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
-
-wmat <- exp(-pointSpaces^2/(2*bestScale^2))
-tempPrediction = predict(wmod_best, wmat, s=wmod_best$lambda.min )
-tempMatrix = t(matrix(tempPrediction, 100, 100))
-image(tempMatrix)
+#apply above distance matrix in the prediction using best model
+tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_best$lambda.min )
+tempMatrix_elastic = t(matrix(tempPrediction_elastic, 100, 100))
+image(tempMatrix_elastic)
 
