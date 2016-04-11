@@ -46,26 +46,44 @@ bp = createDataPartition(stationTempMeans[,1], 1, 0.8, list = FALSE)
 bpVector = 1:length(stationTempMeans[,1]) %in% bp
 train = apply(metDataByYear, 1, function(x) x['SID'] %in% bp)
 metDataTrain = metData[train, ]
+metDataTest = metData[-train,]
 
 #obtain the distance matrix
 xmat = as.matrix(metDataTrain)
-spaces = dist(xmat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
-msp = as.matrix(spaces)
+test_mat = as.matrix(metDataTest)
+xspaces = dist(xmat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+test_spaces = dist(test_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+xmsp = as.matrix(xspaces)
+test_msp = as.matrix(test_spaces)
 
-#kernel function
-wmat = exp(-msp/(2*srange[1]^2))
+test_mat = as.matrix(metDataTest)
+
+all_mat = as.matrix(metData)
+all_spaces = dist(all_mat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
+all_msp = as.matrix(all_spaces)
 
 #generate Gramm matrix for each scale candidate
 mseTrain = rep(-1, length(srange)) #used to test scale candidates
 mseTest = rep(-1, length(srange)) #used to test scale candidates
+# for(i in 1:length(srange)) {
+#   grammMatrix = exp(-xmsp/2*srange[i]^2)
+#   xwmat = cbind(xwmat, grammMatrix)
+# }
+
+
 for(i in 1:length(srange)) {
-  grammMatrix = exp(-msp/2*srange[i]^2)
-  wmat = cbind(wmat, grammMatrix)
+  
+  i = 1
+  #kernel function
+  xwmat = exp(-xmsp/(2*srange[i]^2))
+  all_wmat = exp(-all_msp/(2*srange[i]^2))
+  
+  #the training
+  wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = 1) #lasso
+  
+  #the predicting
+  predTemp = predict(wmod, test_mat, s=wmod$lambda.min )
 }
-
-#the training
-wmod = cv.glmnet(wmat, metDataTrain[,1], alpha = 1) #lasso
-
 #image bounds
 xmin = min(xmat[,c(2)])
 xmax = max(xmat[,c(2)])
@@ -75,18 +93,15 @@ xvec = seq(xmin, xmax, length=100)
 yvec = seq(ymin, ymax, length=100)
 
 #plots
-points<-matrix(0,nrow=100*100,ncol=2)
-ptr = 1
-for(i in 1:100)
-{
-  for (j in 1:100)
-  {
-    points[ptr,1] = xvec[i]
-    points[ptr,2] = yvec[j]
-    ptr = ptr+1
-  }
-}
+# points<-matrix(0,nrow=100*100,ncol=2)
+# ptr = 1
+# for(i in 1:100)
+# {
+#   for (j in 1:100)
+#   {
+#     points[ptr,1] = xvec[i]
+#     points[ptr,2] = yvec[j]
+#     ptr = ptr+1
+#   }
+# }
 
-#define outer product (cross product) function argument
-diff_ij = function(i,j) sqrt(rowSums((points[i,] - xmat[j,])^2))
-distsampletOpts = outer(seq_len(10000), seq_len(dim(xmat)[1]), diff_ij)
