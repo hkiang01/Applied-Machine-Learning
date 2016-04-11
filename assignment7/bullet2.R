@@ -53,7 +53,7 @@ spaces = dist(xmat[,c(2,3)], method = "euclidean", diag = FALSE, upper = FALSE)
 msp = as.matrix(spaces)
 
 #kernel function
-wmat = exp(-msp/(2*srange[i]^2))
+wmat = exp(-msp/(2*srange[1]^2))
 
 #generate Gramm matrix for each scale candidate
 mseTrain = rep(-1, length(srange)) #used to test scale candidates
@@ -67,18 +67,23 @@ for(i in 1:length(srange)) {
 wmod = cv.glmnet(wmat, metDataTrain[,1], alpha = 1) #lasso
 
 #image bounds
-xmin = min(xmat['East_UTM'])
-xmax = max(xmat['East_UTM'])
-ymin = min(xmat['North_UTM'])
-ymax = max(xmat['North_UTM'])
+xmin = min(xmat[,c(2)])
+xmax = max(xmat[,c(2)])
+ymin = min(xmat[,c(3)])
+ymax = max(xmat[,c(3)])
 xvec = seq(xmin, xmax, length=100)
 yvec = seq(ymin, ymax, length=100)
 
 #plots
 points<-matrix(0,nrow=100*100,ncol=2)
-for (i in 0:99){
-  for (j in 1:100){
-    points[i*100 + j, ] = c(xvec[i+1], yvec[j])
+ptr = 1
+for(i in 1:100)
+{
+  for (j in 1:100)
+  {
+    points[ptr,1] = xvec[i]
+    points[ptr,2] = yvec[j]
+    ptr = ptr+1
   }
 }
 
