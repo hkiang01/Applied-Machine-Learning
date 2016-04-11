@@ -20,15 +20,15 @@ tempDataRaw = read.table('Oregon_Met_Data.txt', header = TRUE)
 locData = locDataRaw[c('SID', 'East_UTM', 'North_UTM')]
 tempDataUnfiltered = tempDataRaw[c('SID', 'Year', 'Tmin_deg_C')]
 
-meanEast = mean(locData[,2])
-sdEast = sd(locData[,2])
-meanNorth = mean(locData[,3])
-sdNorth = sd(locData[,3])
-
-locData[,2] = (locData[,2] - meanEast)/sdEast
-locData[,3] = (locData[,3] - meanNorth)/sdNorth
-
-tempData = tempDataUnfiltered[tempDataUnfiltered[,3] < 9999,]
+# meanEast = mean(locData[,2])
+# sdEast = sd(locData[,2])
+# meanNorth = mean(locData[,3])
+# sdNorth = sd(locData[,3])
+# 
+# locData[,2] = (locData[,2] - meanEast)/sdEast
+# locData[,3] = (locData[,3] - meanNorth)/sdNorth
+# 
+# tempData = tempDataUnfiltered[tempDataUnfiltered[,3] < 9999,]
 
 avgTemp = aggregate(tempData, by=list(tempData$SID,tempData$Year), FUN=mean, na.rm=TRUE)
 
