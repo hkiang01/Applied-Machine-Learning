@@ -19,7 +19,7 @@ tempDataRaw = read.table('Oregon_Met_Data.txt', header = TRUE)
 
 locData = locDataRaw[c('SID', 'East_UTM', 'North_UTM')]
 tempDataUnfiltered = tempDataRaw[c('SID', 'Year', 'Tmin_deg_C')]
-
+# 
 # meanEast = mean(locData[,2])
 # sdEast = sd(locData[,2])
 # meanNorth = mean(locData[,3])
@@ -27,8 +27,8 @@ tempDataUnfiltered = tempDataRaw[c('SID', 'Year', 'Tmin_deg_C')]
 # 
 # locData[,2] = (locData[,2] - meanEast)/sdEast
 # locData[,3] = (locData[,3] - meanNorth)/sdNorth
-# 
-# tempData = tempDataUnfiltered[tempDataUnfiltered[,3] < 9999,]
+
+tempData = tempDataUnfiltered[tempDataUnfiltered[,3] < 9999,]
 
 avgTemp = aggregate(tempData, by=list(tempData$SID,tempData$Year), FUN=mean, na.rm=TRUE)
 
@@ -83,7 +83,7 @@ for(i in 1:length(srange)) {
   wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = 1) #lasso
   
   #the predicting
-  predTemp = predict.cv.glmnet(wmod, xwmat, s=wmod$lambda.min )
+  predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
   
   mseTrain[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
   
@@ -115,7 +115,7 @@ bestScale = srange[which.min(mseTrain)]
 spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
 msp <- as.matrix(spaces)
 
-wmat = exp(-msp^2/(2*bestScale))
+wmat = exp(-msp/(2*bestScale))
 
 wmod_best = cv.glmnet(wmat, metData[,1], alpha = 1) #lasso
 
@@ -127,7 +127,7 @@ northbp = t(matrix(metData[bpVector, 3], length(bp), nrow(points)))
 
 pointSpaces = sqrt((east - eastbp)^2 + (north - northbp)^2)
 
-wmat <- exp(-pointSpaces^2/(2*bestScale))
-tempPrediction = predict.cv.glmnet(wmod_best, wmat, s=wmod_best$lambda.min )
+wmat <- exp(-pointSpaces/(2*bestScale))
+tempPrediction = predict(wmod_best, wmat, s=wmod_best$lambda.min )
 tempMatrix = t(matrix(tempPrediction, 100, 100))
 image(tempMatrix)
