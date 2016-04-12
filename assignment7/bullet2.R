@@ -131,6 +131,33 @@ for(i in 1:length(srange)) {
   
   #error rate
   mseTrain[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
+  
+  #ALL THE GRAPHS (FOR EACH SCALE)
+  
+  #kernel function for the base points relative to plot bucketted grid
+  wmat_pointSpaces = exp(-pointSpaces^2/(2*srange[i]^2))
+  
+  #kernel function for distance matrix from all points
+  wmat = exp(-all_msp^2/(2*bestScale^2))
+  
+  #obtain bset model for all points using best scale
+  wmod_best_lasso = cv.glmnet(wmat, all_mat[,1], alpha = 1)
+  bestLambda_lasso = wmod_best_lasso$lambda.min
+  
+  #apply above distance matrix in the prediction using best model
+  tempPrediction_lasso = predict(wmod_best_lasso, wmat_pointSpaces, s=wmod_best_lasso$lambda.min )
+  tempMatrix_lasso = t(matrix(tempPrediction_lasso, 100, 100))
+  
+  #generate heatmap
+  layout(matrix(c(1,2), ncol=2), widths=c(4,1))
+  par(mar=c(4,4,4,1))
+  image(tempMatrix_lasso, xaxt='n', yaxt='n', ann=FALSE)
+  axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
+  axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
+  title(main=paste("Annual Mean of Minimum Temperature\nUsing Lasso w/ scale =",srange[i]), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+  par(mar=c(4,1,4,3))
+  image.scale(tempMatrix_lasso, axis.pos=4)
+  
 }
 
 #choose best scale corresponding to minimum error
@@ -156,7 +183,7 @@ par(mar=c(4,4,4,1))
 image(tempMatrix_lasso, xaxt='n', yaxt='n', ann=FALSE)
 axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
 axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
-title(main="Annual Mean of Minimum Temperature\nUsing Lasso", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+title(main=paste("Annual Mean of Minimum Temperature\nUsing Lasso (Best Result) w/ scale =",bestScale), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
 par(mar=c(4,1,4,3))
 image.scale(tempMatrix_lasso, axis.pos=4)
 
@@ -212,6 +239,32 @@ par(mar=c(4,4,4,1))
 image(tempMatrix_elastic, xaxt='n', yaxt='n', ann=FALSE)
 axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
 axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
-title(main="Annual Mean of Minimum Temperature\nUsing Elastic", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic (Best Result) w/ alpha=",bestAlpha), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
 par(mar=c(4,1,4,3))
 image.scale(tempMatrix_elastic, axis.pos=4)
+
+
+#ALL THE GRAPHS (FOR EACH ALPHA FOR BEST ELASTIC SCALE)
+
+#apply kernel function to best scale
+wmat_elastic = exp(-all_msp^2/(2*bestScale_elastic^2))
+
+for(i in 1:length(net_alphas)){
+  #obtain bset model for all points using best scale and best alpha
+  wmod_best_elastic = cv.glmnet(wmat_elastic, metData[,1], alpha = net_alphas[i]) #elastic
+  bestLambda_elastic = wmod_best_elastic$lambda.min
+  
+  #apply above distance matrix in the prediction using best model
+  tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_best_elastic$lambda.min )
+  tempMatrix_elastic = t(matrix(tempPrediction_elastic, 100, 100))
+  
+  #generate heatmap
+  layout(matrix(c(1,2), ncol=2), widths=c(4,1))
+  par(mar=c(4,4,4,1))
+  image(tempMatrix_elastic, xaxt='n', yaxt='n', ann=FALSE)
+  axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
+  axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
+  title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic w/ alpha=", net_alphas[i]), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+  par(mar=c(4,1,4,3))
+  image.scale(tempMatrix_elastic, axis.pos=4)
+}
