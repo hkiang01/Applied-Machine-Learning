@@ -23,6 +23,9 @@ setwd('/Users/harry/projects/aml/assignment7/')
 #srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
 srange = seq(50000, 100000, 2500)
 
+#choice of alpha values for elastic net
+net_alphas = array(c(.4,.5,.6))
+
 locDataRaw = read.table('Locations.txt', header = TRUE)
 tempDataRaw = read.table('Oregon_Met_Data.txt', header = TRUE)
 
@@ -160,29 +163,42 @@ image.scale(tempMatrix_lasso, axis.pos=4)
 # Now investigate the effect of different choices of
 # elastic net constant (alpha)
 
-#choice of alpha values for elastic net
-net_alphas = array(c(.4,.5,.6))
-mseTrainElastic = rep(-1, length(net_alphas)) #used to test scale candidate
+#used to test scale and alpha candidates for elastic net
+mseTrainElastic = array()
+scaleCandidatesArr = array()
+alphaCandidatesArr = array()
 
-#use same scale as lasso for basis of comparison
-bestScale = bestScale #srange[which.min(mseTrain)]
-
-for(i in 1:length(net_alphas)) {
+#train across scales AND alphas
+#train across scales AND alphas
+#train across scales AND alphas
+for(i in 1:length(srange)){
   
-  #the training
-  wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = net_alphas[i] ) #elastic net
+  #kernel function for given scale
+  xwmat = exp(-xmsp^2/(2*srange[i]^2))
+  scaleCandidatesArr[i] = srange[i]
   
-  #the predicting
-  predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
-  mseTrainElastic[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
-  
+  for(j in 1:length(net_alphas)) {
+    
+    #the training
+    wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = net_alphas[j] ) #elastic net
+    
+    #the predicting
+    predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
+    mseTrainElastic[i*length(net_alphas) + j] = sum((predTemp - train_answers)^2) / nrow(train_answers)
+    
+    alphaCandidatesArr[i*length(net_alphas) + j] = net_alphas[j]
+    
+  }
 }
-
 #choose best alpha corresponding to minimal error
-bestAlpha = net_alphas[which.min(mseTrainElastic)]
+bestScale_elastic = scaleCandidatesArr[which.min(mseTrainElastic)/length(net_alphas)]
+bestAlpha = alphaCandidatesArr[which.min(mseTrainElastic)]
+
+#apply kernel function to best scale
+wmat_elastic = exp(-xmsp^2/(2*bestScale_elastic^2))
 
 #obtain bset model for all points using best scale and best alpha
-wmod_best_elastic = cv.glmnet(wmat, metData[,1], alpha = bestAlpha) #elastic
+wmod_best_elastic = cv.glmnet(wmat_elastic, metData[,1], alpha = bestAlpha) #elastic
 
 #apply above distance matrix in the prediction using best model
 tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_best_elastic$lambda.min )
