@@ -144,6 +144,7 @@ wmat = exp(-all_msp^2/(2*bestScale^2))
 
 #obtain bset model for all points using best scale
 wmod_best_lasso = cv.glmnet(wmat, all_mat[,1], alpha = 1)
+bestLambda_lasso = wmod_best_lasso$lambda.min
 
 #apply above distance matrix in the prediction using best model
 tempPrediction_lasso = predict(wmod_best_lasso, wmat_pointSpaces, s=wmod_best_lasso$lambda.min )
@@ -195,10 +196,11 @@ bestScale_elastic = scaleCandidatesArr[which.min(mseTrainElastic)/length(net_alp
 bestAlpha = alphaCandidatesArr[which.min(mseTrainElastic)]
 
 #apply kernel function to best scale
-wmat_elastic = exp(-xmsp^2/(2*bestScale_elastic^2))
+wmat_elastic = exp(-all_msp^2/(2*bestScale_elastic^2))
 
 #obtain bset model for all points using best scale and best alpha
 wmod_best_elastic = cv.glmnet(wmat_elastic, metData[,1], alpha = bestAlpha) #elastic
+bestLambda_elastic = wmod_best_elastic$lambda.min
 
 #apply above distance matrix in the prediction using best model
 tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_best_elastic$lambda.min )
