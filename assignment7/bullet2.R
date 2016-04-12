@@ -1,3 +1,6 @@
+setwd('/Users/harry/projects/aml/assignment7/')
+
+
 source("image.scale.R")
 
 #DATA AND PLOTTING OVERHEAD
@@ -15,8 +18,6 @@ if (!require("RColorBrewer")) {
   library(RColorBrewer)
 }
 
-
-setwd('/Users/harry/projects/aml/assignment7/')
 #setwd('/Users/annlinsheih/Dev/aml/assignment7/')
 
 # list of scale candidates
@@ -138,9 +139,9 @@ for(i in 1:length(srange)) {
   wmat_pointSpaces = exp(-pointSpaces^2/(2*srange[i]^2))
   
   #kernel function for distance matrix from all points
-  wmat = exp(-all_msp^2/(2*bestScale^2))
+  wmat = exp(-all_msp^2/(2*srange[i]^2))
   
-  #obtain bset model for all points using best scale
+  #obtain best model for all points using best scale
   wmod_best_lasso = cv.glmnet(wmat, all_mat[,1], alpha = 1)
   bestLambda_lasso = wmod_best_lasso$lambda.min
   
@@ -266,7 +267,6 @@ plot(wmod_best_elastic, main=paste("MSE v. Lambda (Elastic), h=", bestScale_elas
 wmat_elastic = exp(-all_msp^2/(2*bestScale_elastic^2))
 
 for(i in 1:length(net_alphas)){
-  i=2
   #obtain bset model for all points using best scale and best alpha
   wmod_best_elastic = cv.glmnet(wmat_elastic, metData[,1], alpha = net_alphas[i]) #elastic
   bestLambda_elastic = wmod_best_elastic$lambda.min
