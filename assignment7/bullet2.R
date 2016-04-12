@@ -1,12 +1,27 @@
+source("image.scale.R")
+
 #DATA AND PLOTTING OVERHEAD
 
 library('glmnet') #glmnet
 library(caret) #createDataPartition
 
+#heat map and plotting libraries
+if (!require("gplots")) {
+  install.packages("gplots", dependencies = TRUE)
+  library(gplots)
+}
+if (!require("RColorBrewer")) {
+  install.packages("RColorBrewer", dependencies = TRUE)
+  library(RColorBrewer)
+}
+
+
 setwd('/Users/harry/projects/aml/assignment7/')
 #setwd('/Users/annlinsheih/Dev/aml/assignment7/')
 
-srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
+# list of scale candidates
+#srange = c(10000, 20000, 50000, 75000, 100000, 150000, 200000, 300000, 500000000)
+srange = seq(50000, 100000, 2500)
 
 locDataRaw = read.table('Locations.txt', header = TRUE)
 tempDataRaw = read.table('Oregon_Met_Data.txt', header = TRUE)
@@ -56,9 +71,6 @@ all_mat = as.matrix(metData)
 all_spaces = dist(all_mat[,c("East_UTM", "North_UTM")], method = "euclidean", diag = FALSE, upper = FALSE)
 all_msp = as.matrix(all_spaces)
 
-#kernel function for distance matrix from all points
-wmat = exp(-all_msp^2/(2*bestScale^2))
-
 #image bounds
 xmin = min(locData[,c("East_UTM")])
 xmax = max(locData[,c("East_UTM")])
@@ -104,7 +116,7 @@ mseTest = rep(-1, length(srange)) #used to test scale candidates
 train_answers = as.matrix(xmat[,c(1)])
 
 for(i in 1:length(srange)) {
-
+  
   #kernel function
   xwmat = exp(-xmsp^2/(2*srange[i]^2))
   
@@ -113,7 +125,7 @@ for(i in 1:length(srange)) {
   
   #the predicting
   predTemp = predict(wmod, xwmat, s=wmod$lambda.min )
-
+  
   #error rate
   mseTrain[i] = sum((predTemp - train_answers)^2) / nrow(train_answers)
 }
@@ -121,13 +133,25 @@ for(i in 1:length(srange)) {
 #choose best scale corresponding to minimum error
 bestScale = srange[which.min(mseTrain)]
 
+#kernel function for the base points relative to plot bucketted grid
+wmat_pointSpaces = exp(-pointSpaces^2/(2*bestScale^2))
+
+#kernel function for distance matrix from all points
+wmat = exp(-all_msp^2/(2*bestScale^2))
+
 #obtain bset model for all points using best scale
 wmod_best_lasso = cv.glmnet(wmat, all_mat[,1], alpha = 1)
 
 #apply above distance matrix in the prediction using best model
-tempPrediction_lasso = predict(wmod_best_lasso, wmat_pointSpaces, s=wmod_best$lambda.min )
+tempPrediction_lasso = predict(wmod_best_lasso, wmat_pointSpaces, s=wmod_best_lasso$lambda.min )
 tempMatrix_lasso = t(matrix(tempPrediction_lasso, 100, 100))
-image(tempMatrix_lasso)
+
+#generate heatmap
+par(mar=c(5,5,3,1))
+image(tempMatrix_lasso, xaxt='n', yaxt='n', ann=FALSE)
+axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
+axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
+title(main="Annual Mean of Minimum Temperature for Oregon Weather Stations\nUsing Lasso", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
 
 # Bullet3
 # Now investigate the effect of different choices of
@@ -141,7 +165,7 @@ mseTrainElastic = rep(-1, length(net_alphas)) #used to test scale candidate
 bestScale = bestScale #srange[which.min(mseTrain)]
 
 for(i in 1:length(net_alphas)) {
-
+  
   #the training
   wmod = cv.glmnet(xwmat, metDataTrain[,1], alpha = net_alphas[i] ) #elastic net
   
@@ -158,7 +182,12 @@ bestAlpha = net_alphas[which.min(mseTrainElastic)]
 wmod_best_elastic = cv.glmnet(wmat, metData[,1], alpha = bestAlpha) #elastic
 
 #apply above distance matrix in the prediction using best model
-tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_best$lambda.min )
+tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_best_elastic$lambda.min )
 tempMatrix_elastic = t(matrix(tempPrediction_elastic, 100, 100))
-image(tempMatrix_elastic)
 
+#generate heatmap
+par(mar=c(5,5,3,1))
+image(tempMatrix_elastic, xaxt='n', yaxt='n', ann=FALSE)
+axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
+axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
+title(main="Annual Mean of Minimum Temperature for Oregon Weather Stations\nUsing Lasso", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
