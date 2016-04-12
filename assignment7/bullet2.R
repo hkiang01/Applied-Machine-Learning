@@ -187,6 +187,10 @@ title(main=paste("Annual Mean of Minimum Temperature\nUsing Lasso (Best Result) 
 par(mar=c(4,1,4,3))
 image.scale(tempMatrix_lasso, axis.pos=4)
 
+#predictors for best lasso model
+plot(wmod_best_lasso)
+
+
 # Bullet3
 # Now investigate the effect of different choices of
 # elastic net constant (alpha)
@@ -239,10 +243,14 @@ par(mar=c(4,4,4,1))
 image(tempMatrix_elastic, xaxt='n', yaxt='n', ann=FALSE)
 axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
 axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
-title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic (Best Result) w/ alpha=",bestAlpha), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic w/ scale=", bestScale_elastic, ", alpha=", bestAlpha), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
 par(mar=c(4,1,4,3))
 image.scale(tempMatrix_elastic, axis.pos=4)
 
+#predictors for best elastic model
+par(mar=c(3,3,4,1))
+plot(wmod_best_elastic, main=paste("MSE v. Lambda (Elastic), scale=", bestScale_elastic, ", alpha=", net_alphas[i]),
+     xlab="Regularization Constant", ylab="MSE")
 
 #ALL THE GRAPHS (FOR EACH ALPHA FOR BEST ELASTIC SCALE)
 
@@ -250,6 +258,7 @@ image.scale(tempMatrix_elastic, axis.pos=4)
 wmat_elastic = exp(-all_msp^2/(2*bestScale_elastic^2))
 
 for(i in 1:length(net_alphas)){
+  i=2
   #obtain bset model for all points using best scale and best alpha
   wmod_best_elastic = cv.glmnet(wmat_elastic, metData[,1], alpha = net_alphas[i]) #elastic
   bestLambda_elastic = wmod_best_elastic$lambda.min
@@ -264,7 +273,7 @@ for(i in 1:length(net_alphas)){
   image(tempMatrix_elastic, xaxt='n', yaxt='n', ann=FALSE)
   axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
   axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
-  title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic w/ alpha=", net_alphas[i]), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+  title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic w/ scale=", bestScale_elastic, ", alpha=", net_alphas[i]), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
   par(mar=c(4,1,4,3))
   image.scale(tempMatrix_elastic, axis.pos=4)
 }
