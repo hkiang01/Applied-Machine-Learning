@@ -147,11 +147,14 @@ tempPrediction_lasso = predict(wmod_best_lasso, wmat_pointSpaces, s=wmod_best_la
 tempMatrix_lasso = t(matrix(tempPrediction_lasso, 100, 100))
 
 #generate heatmap
-par(mar=c(5,5,3,1))
+layout(matrix(c(1,2), ncol=2), widths=c(4,1))
+par(mar=c(4,4,4,1))
 image(tempMatrix_lasso, xaxt='n', yaxt='n', ann=FALSE)
 axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
 axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
-title(main="Annual Mean of Minimum Temperature for Oregon Weather Stations\nUsing Lasso", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+title(main="Annual Mean of Minimum Temperature\nUsing Lasso", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+par(mar=c(4,1,4,3))
+image.scale(tempMatrix_lasso, axis.pos=4)
 
 # Bullet3
 # Now investigate the effect of different choices of
@@ -186,8 +189,11 @@ tempPrediction_elastic = predict(wmod_best_elastic, wmat_pointSpaces, s=wmod_bes
 tempMatrix_elastic = t(matrix(tempPrediction_elastic, 100, 100))
 
 #generate heatmap
-par(mar=c(5,5,3,1))
+layout(matrix(c(1,2), ncol=2), widths=c(4,1))
+par(mar=c(4,4,4,1))
 image(tempMatrix_elastic, xaxt='n', yaxt='n', ann=FALSE)
 axis(1, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(xmin/1000), as.integer(xmax/1000), length=6)))
 axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(ymax/1000), length=6)))
-title(main="Annual Mean of Minimum Temperature for Oregon Weather Stations\nUsing Lasso", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+title(main="Annual Mean of Minimum Temperature\nUsing Elastic", xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
+par(mar=c(4,1,4,3))
+image.scale(tempMatrix_elastic, axis.pos=4)
