@@ -5,6 +5,10 @@ Open RStudio.
 setwd('/directory/of/project')
 source('project_file.R')
 
+PART 1: hw7.R
+PART 2: bullet2.R
+PART 3: bullet2.R
+
 —————————————————————————————————————————————————————————————————————
 
  S A I L O R _ M O O N 
