@@ -33,41 +33,41 @@ stationTempMeans = aggregate(metDataByYear[,c('SID', 'Tmin_deg_C')], by= list(me
 bp = createDataPartition(stationTempMeans[,1], 1, 0.8, list = FALSE)
 mseTrain = rep(0, length(srange))
 mseTest = rep(0, length(srange))
-# for (partitionIt in 1:10){
-#   bpVector = 1:length(stationTempMeans[,1]) %in% bp
-#   train = apply(metDataByYear, 1, function(x) x['SID'] %in% bp)
-#   metDataTrain = metData[train, ]
-#   
-#   spacesTrain = dist(metDataTrain[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
-#   spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
-#   mspTrain <- as.matrix(spacesTrain)
-#   msp <- as.matrix(spaces)
-#   msp <- msp[,train]
-#   for (rangeIt in 1:length(srange)){
-#     
-#     
-#     wmat = exp(-mspTrain^2/(2*srange[rangeIt]^2))
-#     
-#     frameData = data.frame(temp = metDataTrain[,1], x = wmat)
-#     metSmoothCVlm <- lm(temp ~ ., data = frameData)
-#     
-#     
-#     wmat <- exp(-msp^2/(2*srange[rangeIt]^2))
-#     frameData = data.frame(x = wmat)
-#     predTempCV <- predict(metSmoothCVlm, newdata = frameData)
-#     
-#     # betahatols = coef(metSmoothCVlm)
-#     # betahatols[is.na(betahatols)] = 0
-#     # yhatols = cbind(rep(1, nrow(wmat)), as.matrix(wmat)) %*% betahatols
-#     
-#     predTempCVwSID = cbind(metDataByYear['SID'], predTempCV)
-#     predTempAvgCV = aggregate(predTempCVwSID, by=list(predTempCVwSID$SID), FUN=mean, na.rm=TRUE)
-#     
-#     
-#     mseTrain[rangeIt] = mseTrain[rangeIt] + sum((predTempAvgCV[bpVector,'predTempCV'] - stationTempMeans[bpVector,'Tmin_deg_C'])^2)/length(predTempAvgCV[bpVector,'predTempCV'])
-#     mseTest[rangeIt] = mseTest[rangeIt] + sum((predTempAvgCV[!bpVector,'predTempCV'] - stationTempMeans[!bpVector,'Tmin_deg_C'])^2)/length(predTempAvgCV[!bpVector,'predTempCV'])
-#   }
-# }
+for (partitionIt in 1:10){
+  bpVector = 1:length(stationTempMeans[,1]) %in% bp
+  train = apply(metDataByYear, 1, function(x) x['SID'] %in% bp)
+  metDataTrain = metData[train, ]
+  
+  spacesTrain = dist(metDataTrain[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
+  spaces = dist(metData[, c(2,3)], method = 'euclidean' ,diag= FALSE,upper= FALSE)
+  mspTrain <- as.matrix(spacesTrain)
+  msp <- as.matrix(spaces)
+  msp <- msp[,train]
+  for (rangeIt in 1:length(srange)){
+    
+    
+    wmat = exp(-mspTrain^2/(2*srange[rangeIt]^2))
+    
+    frameData = data.frame(temp = metDataTrain[,1], x = wmat)
+    metSmoothCVlm <- lm(temp ~ ., data = frameData)
+    
+    
+    wmat <- exp(-msp^2/(2*srange[rangeIt]^2))
+    frameData = data.frame(x = wmat)
+    predTempCV <- predict(metSmoothCVlm, newdata = frameData)
+    
+    # betahatols = coef(metSmoothCVlm)
+    # betahatols[is.na(betahatols)] = 0
+    # yhatols = cbind(rep(1, nrow(wmat)), as.matrix(wmat)) %*% betahatols
+    
+    predTempCVwSID = cbind(metDataByYear['SID'], predTempCV)
+    predTempAvgCV = aggregate(predTempCVwSID, by=list(predTempCVwSID$SID), FUN=mean, na.rm=TRUE)
+    
+    
+    mseTrain[rangeIt] = mseTrain[rangeIt] + sum((predTempAvgCV[bpVector,'predTempCV'] - stationTempMeans[bpVector,'Tmin_deg_C'])^2)/length(predTempAvgCV[bpVector,'predTempCV'])
+    mseTest[rangeIt] = mseTest[rangeIt] + sum((predTempAvgCV[!bpVector,'predTempCV'] - stationTempMeans[!bpVector,'Tmin_deg_C'])^2)/length(predTempAvgCV[!bpVector,'predTempCV'])
+  }
+}
 
 
 mseTrainR = mseTrain / partitionIt
