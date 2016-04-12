@@ -157,6 +157,8 @@ for(i in 1:length(srange)) {
   title(main=paste("Annual Mean of Minimum Temperature\nUsing Lasso w/ scale =",srange[i]), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
   par(mar=c(4,1,4,3))
   image.scale(tempMatrix_lasso, axis.pos=4)
+  par(mfrow=c(1,1)) #cleanup
+  
   
 }
 
@@ -186,10 +188,14 @@ axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(
 title(main=paste("Annual Mean of Minimum Temperature\nUsing Lasso (Best Result) w/ scale =",bestScale), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
 par(mar=c(4,1,4,3))
 image.scale(tempMatrix_lasso, axis.pos=4)
+par(mfrow=c(1,1)) #cleanup
+
 
 #predictors for best lasso model
-plot(wmod_best_lasso)
-
+#predictors for best elastic model
+par(mar=c(5,5,5,1))
+plot(wmod_best_lasso, main=paste("MSE v. Lambda (Lasso), h=", bestScale),
+     xlab="Regularization Constant", ylab="MSE")
 
 # Bullet3
 # Now investigate the effect of different choices of
@@ -246,10 +252,12 @@ axis(2, at=seq(0,1,0.2), labels=as.matrix(seq(as.integer(ymin/1000), as.integer(
 title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic w/ scale=", bestScale_elastic, ", alpha=", bestAlpha), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
 par(mar=c(4,1,4,3))
 image.scale(tempMatrix_elastic, axis.pos=4)
+par(mfrow=c(1,1)) #cleanup
+
 
 #predictors for best elastic model
-par(mar=c(3,3,4,1))
-plot(wmod_best_elastic, main=paste("MSE v. Lambda (Elastic), scale=", bestScale_elastic, ", alpha=", net_alphas[i]),
+par(mar=c(5,5,5,1))
+plot(wmod_best_elastic, main=paste("MSE v. Lambda (Elastic), h=", bestScale_elastic, ", alpha=", net_alphas[i]),
      xlab="Regularization Constant", ylab="MSE")
 
 #ALL THE GRAPHS (FOR EACH ALPHA FOR BEST ELASTIC SCALE)
@@ -276,4 +284,6 @@ for(i in 1:length(net_alphas)){
   title(main=paste("Annual Mean of Minimum Temperature\nUsing Elastic w/ scale=", bestScale_elastic, ", alpha=", net_alphas[i]), xlab="East_UTM  in 1000's", ylab="North_UTM  in 1000's")
   par(mar=c(4,1,4,3))
   image.scale(tempMatrix_elastic, axis.pos=4)
+  par(mfrow=c(1,1)) #cleanup
+  
 }
