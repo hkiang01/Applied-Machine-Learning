@@ -2,6 +2,17 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 import tensorflow as tf
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+flags.DEFINE_string('summaries_dir', '/tmp/mnist_logs1', 'Summaries directory')
+flags.DEFINE_integer('max_steps', 2000, 'Number of steps to run trainer.')
+
+# prevents multiple graphs warning in tensorboard
+if tf.gfile.Exists(FLAGS.summaries_dir):
+  tf.gfile.DeleteRecursively(FLAGS.summaries_dir)
+tf.gfile.MakeDirs(FLAGS.summaries_dir)
+
 sess = tf.InteractiveSession()
 x = tf.placeholder(tf.float32, [None, 784])
 W = tf.Variable(tf.zeros([784, 10]))
@@ -70,22 +81,15 @@ with tf.name_scope('train'):
   train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 
 merged = tf.merge_all_summaries()
-train_writer = tf.train.SummaryWriter('/tmp/mnist_logs1' + '/train', sess.graph)
-test_writer = tf.train.SummaryWriter('/tmp/mnist_logs1' + '/test')
-
-
+train_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + '/train', sess.graph)
+test_writer = tf.train.SummaryWriter(FLAGS.summaries_dir + '/test')
 
 tf.initialize_all_variables().run()
-for i in range(20000):
+for i in range(FLAGS.max_steps + 1): # +1 to prevent necessity of repeating code in if block, graph error
   batch = mnist.train.next_batch(50)
   if i%100 == 0:
     summary, test_accuracy = sess.run([merged, accuracy], feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
     test_writer.add_summary(summary, i)
-    print("step %d, training accuracy %g"%(i, test_accuracy))
+    print("Accuracy at step %s: %s"%(i, test_accuracy))
   summary,_ = sess.run([merged, train_step], feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
   train_writer.add_summary(summary, i)
-
-summary, test_accuracy = sess.run([merged, accuracy], feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0})
-print("test accuracy %g"%test_accuracy)
-
-
