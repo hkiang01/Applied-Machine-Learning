@@ -78,6 +78,19 @@ TOWER_NAME = 'tower'
 
 DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
 
+# from mnist
+def weight_variable(shape):
+  initial = tf.truncated_normal(shape, stddev=0.1)
+  return tf.Variable(initial)
+
+# from mnist
+def bias_variable(shape):
+  initial = tf.constant(0.1, shape=shape)
+  return tf.Variable(initial)
+
+# from mnist
+def conv2d(x, W):
+  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def _activation_summary(x):
   """Helper to create summaries for activations.
@@ -355,34 +368,30 @@ def inference3(images):
   #
   # conv1
   with tf.variable_scope('conv1') as scope:
-    kernel = _variable_with_weight_decay('weights', shape=[5, 5, 3, 64],
+    kernel = _variable_with_weight_decay('weights', shape=[5, 5, 3, 32],
                                          stddev=1e-4, wd=0.0)
     conv = tf.nn.conv2d(images, kernel, [1, 1, 1, 1], padding='SAME')
-    biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.0))
+    biases = _variable_on_cpu('biases', [32], tf.constant_initializer(0.0))
     bias = tf.nn.bias_add(conv, biases)
     conv1 = tf.nn.relu(bias, name=scope.name)
-    _activation_summary(conv1)
 
-  # conv3
-  with tf.variable_scope('conv3') as scope:
-    kernel = _variable_with_weight_decay('weights', shape=[5, 5, 64, 64],
-                                         stddev=1e-4, wd=0.0)
-    conv = tf.nn.conv2d(conv1, kernel, [1, 1, 1, 1], padding='SAME')
-    biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.1))
-    bias = tf.nn.bias_add(conv, biases)
-    conv3 = tf.nn.relu(bias, name=scope.name)
-    _activation_summary(conv3)
+    #expansion of conv1
+    W_conv1_expansion = weight_variable([5, 5, 32, 64])
+    b_conv1_expansion = bias_variable([64])
+    h_conv1_expansion = tf.nn.relu(conv2d(conv1, W_conv1_expansion) + b_conv1_expansion)
+
+    _activation_summary(conv1)
 
   # pool1
   if FLAGS.enable_pool1:
-    pool1 = tf.nn.max_pool(conv3, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
+    pool1 = tf.nn.max_pool(h_conv1_expansion, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
                          padding='SAME', name='pool1')
   # norm1
   if FLAGS.enable_pool1:
     norm1 = tf.nn.lrn(pool1, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
                     name='norm1')
   else:
-    norm1 = tf.nn.lrn(conv3, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
+    norm1 = tf.nn.lrn(h_conv1_expansion, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
                     name='norm1')
 
   # conv2
@@ -395,19 +404,8 @@ def inference3(images):
     conv2 = tf.nn.relu(bias, name=scope.name)
     _activation_summary(conv2)
 
-  # conv4
-  with tf.variable_scope('conv4') as scope:
-    kernel = _variable_with_weight_decay('weights', shape=[5, 5, 64, 64],
-                                         stddev=1e-4, wd=0.0)
-    conv = tf.nn.conv2d(conv2, kernel, [1, 1, 1, 1], padding='SAME')
-    biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.1))
-    bias = tf.nn.bias_add(conv, biases)
-    conv4 = tf.nn.relu(bias, name=scope.name)
-    _activation_summary(conv4)
-
-
   # norm2
-  norm2 = tf.nn.lrn(conv4, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
+  norm2 = tf.nn.lrn(conv2, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75,
                     name='norm2')
   # pool2
   if FLAGS.enable_pool2:
