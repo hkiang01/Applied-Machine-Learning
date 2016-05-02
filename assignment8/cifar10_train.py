@@ -67,7 +67,7 @@ def train():
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits = cifar10.inference3(images)
+    logits = cifar10.inference4(images)
 
     # Calculate loss.
     loss = cifar10.loss(logits, labels)
