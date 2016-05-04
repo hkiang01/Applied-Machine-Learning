@@ -3,6 +3,11 @@ To run project:
 In terminal:
 python [file path here]
 
+Part 2: MNIST Deep Learning architecture modifications
+	Designed for tensorflow 0.8 and tensorboard 0.8
+	Seven architectures labeled by roman numerals i - vii
+	files designated as mnist_deep_i.py, mnist_deep_ii.py, ..., mnist_deep_vii.py
+
 How to run CIFAR (Because I don't know how to import files in Python)...
 
 - Go into usr/.../dist-packages/tensorflow/<path-to-cifar10.py/ (or edit the import lines in cifar10_train.py, cifar10_eval.py, cifar10.py, etc. if you know how to import things in Python)
