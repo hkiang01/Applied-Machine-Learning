@@ -1,0 +1,10 @@
+for parts 1 and 2 include the code files are:
+
+mnist_deep_tensorboard.py
+mnist_deep_i.py
+mnist_deep_ii.py
+mnist_deep_iii.py
+mnist_deep_iv.py
+mnist_deep_v.py
+mnist_deep_vi.py
+mnist_deep_vii.py
