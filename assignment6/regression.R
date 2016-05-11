@@ -7,8 +7,8 @@ library('MASS')  #boxcox
 
 #last 2 cols are lat and long
 
-# setwd('/Users/harry/projects/aml/assignment6/') # harrison's
-setwd('/Users/annlinsheih/Dev/aml/assignment6') # annlin's
+ setwd('~/projects/Applied-Machine-Learning/assignment6/') # harrison's
+#setwd('/Users/annlinsheih/Dev/aml/assignment6') # annlin's
 # source('~/Dev/aml/assignment6/regression.R')
 
 rawdat<-read.csv('default_plus_chromatic_features_1059_tracks.txt', header=FALSE)

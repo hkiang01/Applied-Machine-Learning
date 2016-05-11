@@ -7,7 +7,7 @@ library('glmnet') #glmnet
 
 #last 2 cols are lat and long
 
-setwd('/Users/harry/projects/aml/assignment6/')
+setwd('~/projects/Applied-Machine-Learning/assignment6/')
 rawdat<-read.csv('default_plus_chromatic_features_1059_tracks.txt', header=FALSE)
 xdat<-rawdat[,-c(ncol(rawdat),ncol(rawdat)-1)]
 ydat<-rawdat[,c(ncol(rawdat)-1,ncol(rawdat))]

@@ -101,7 +101,7 @@ em_multinomial <- function(xdatRaw, N, itNum = 100){
   return(list(wordProb=wordProb, clusterProb=clusterProb))
 }
 
-processing_docs<-FALSE
+processing_docs<-TRUE
 
 if(processing_docs) {
   #For Nips
